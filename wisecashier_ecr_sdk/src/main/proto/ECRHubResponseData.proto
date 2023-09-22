@@ -1,0 +1,129 @@
+syntax = "proto3";
+package com.wiseasy.ecr.hub.data;
+option java_package = "com.wiseasy.ecr.hub.data";
+option java_outer_classname = "ECRHubResponseProto";
+message ECRHubResponse {
+  /**
+  topic ：ecrhub.init：init（Handshake）；ecrhub.pay.order：payment；ecrhub.pay.query：query；ecrhub.pay.close：close order；ecrhub.heartbeat：heart beat
+   */
+  string topic = 1;
+  /**
+  Message ID, used to track the sending and returning of orders
+  */
+  string msg_id = 2;
+  /**
+  AppID of payment application
+  */
+  string  app_id = 3;
+  /**
+  time stamp
+  */
+  string timestamp = 4;
+  /**
+  status
+ */
+  bool success = 5;
+  /**
+  error message
+  */
+  string errorMsg = 6;
+  /**
+  sdk version
+  */
+  string version = 7;
+  /**
+  Response Business Data
+  */
+  ResponseBizData biz_data = 8;
+  /**
+  Response device data
+  */
+  ResponseDeviceData device_data = 9;
+}
+
+message ResponseDeviceData {
+  /**
+  device sn
+  */
+  string device_sn = 1;
+  /**
+  device model
+  */
+  string device_model = 2;
+  /**
+  cashier app name
+  */
+  string app_name = 3;
+  /**
+  cashier app version
+  */
+  string app_version = 4;
+}
+
+message ResponseBizData {
+  /**
+  Merchant order number
+  */
+  string merchant_order_no = 1;
+  /**
+   order amount
+  */
+  string order_amount = 2;
+  /**
+  trans amount
+  */
+  string trans_no = 3;
+  /**
+  price currency
+  */
+  string price_currency = 4;
+  /**
+  trans type
+  */
+  string trans_type = 5;
+  /**
+  store no
+  */
+  string store_no = 6;
+  /**
+  terminal sn
+  */
+  string terminal_sn = 7;
+  /**
+  pay scenario
+  */
+  string pay_scenario = 8;
+  /**
+  trans status
+  */
+  string trans_status = 9;
+  /**
+  pay channel trans_no
+  */
+  string pay_channel_trans_no = 10;
+  /**
+  pay account id
+  */
+  string pay_user_account_id = 11;
+  /**
+  paid amount
+  */
+  string paid_amount = 12;
+  /**
+  trans end time
+  */
+  string trans_end_time = 13;
+  /**
+  pay method id
+  */
+  string pay_method_id = 14;
+  /**
+  token
+  */
+  string token = 15;
+  /**
+ extends params
+ */
+  map<string, string> extends_params = 16;
+}
+

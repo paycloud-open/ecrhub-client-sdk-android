@@ -1,2 +1,2 @@
 include ':app', ':wisecashier_ecr_sdk'
-rootProject.name='wisecashier_ecr_sdk'
+rootProject.name='wisecashier_ecr_sdk_demo'

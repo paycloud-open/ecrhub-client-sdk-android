@@ -134,6 +134,13 @@ public class ECRHubClient {
         webSocketClient.connect();
     }
 
+    public void disConnect() {
+        if (!webSocketClient.isOpen()) {
+            return;
+        }
+        webSocketClient.close();
+    }
+
     /**
      * 开启重连
      */

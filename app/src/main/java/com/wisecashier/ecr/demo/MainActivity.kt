@@ -31,6 +31,9 @@ class MainActivity : Activity(), ECRHubConnectListener {
             mClient = ECRHubClient("ws://" + text, config, this)
             mClient.connect()
         }
+        tv_btn_8.setOnClickListener{
+            mClient.disConnect()
+        }
         tv_btn_2.setOnClickListener {
             if (!isConnected) {
                 runOnUiThread {

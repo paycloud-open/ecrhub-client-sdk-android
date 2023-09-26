@@ -38,5 +38,6 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.github.paycloud-open:ecr-hub-client-sdk-android:1.0.2'
+    implementation project(path: ':wisecashier_ecr_sdk')
+    //implementation 'com.github.paycloud-open:ecr-hub-client-sdk-android:1.0.2'
 }

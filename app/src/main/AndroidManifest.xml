@@ -24,8 +24,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".PaymentActivity" />
+        <activity android:name=".CloseActivity" />
+        <activity android:name=".QueryActivity" />
         <activity android:name=".RefundActivity" />
-        <activity android:name=".QueryActivity"/>
-        <activity android:name=".CloseActivity"/>
     </application>
 </manifest>

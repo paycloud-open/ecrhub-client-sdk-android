@@ -23,6 +23,9 @@ class MainActivity : Activity(), ECRHubConnectListener {
         setContentView(R.layout.activity_main)
         val config = ECRHubConfig()
         tv_btn_5.setOnClickListener {
+            if (isConnected) {
+                return@setOnClickListener
+            }
             val text = edit_input_ip.text.toString()
             if (text.isEmpty()) {
                 Toast.makeText(this, "请输入ip地址", Toast.LENGTH_LONG).show()
@@ -31,7 +34,7 @@ class MainActivity : Activity(), ECRHubConnectListener {
             mClient = ECRHubClient("ws://" + text, config, this)
             mClient.connect()
         }
-        tv_btn_8.setOnClickListener{
+        tv_btn_8.setOnClickListener {
             mClient.disConnect()
         }
         tv_btn_2.setOnClickListener {

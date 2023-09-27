@@ -44,5 +44,6 @@ class CloseActivity : Activity() {
 
             })
         }
+
     }
 }

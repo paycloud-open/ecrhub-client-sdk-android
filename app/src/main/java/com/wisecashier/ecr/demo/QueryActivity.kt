@@ -27,6 +27,10 @@ class QueryActivity : Activity() {
             params.origMerchantOrderNo = merchantOrderNo
             params.appId = "wz6012822ca2f1as78"
             params.msgId = "11322"
+            runOnUiThread {
+                tv_btn_3.text =
+                    tv_btn_3.text.toString() + "\n" + "交易发送数据" + params.toJSON().toString()
+            }
             MainActivity.mClient.payment.query(params, object :
                 ECRHubResponseCallBack {
                 override fun onError(errorCode: String?, errorMsg: String?) {

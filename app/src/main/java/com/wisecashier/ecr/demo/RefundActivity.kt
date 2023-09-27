@@ -11,8 +11,36 @@ import kotlinx.android.synthetic.main.activity_refund.edit_input_merchant_order_
 import kotlinx.android.synthetic.main.activity_refund.tv_btn_1
 import kotlinx.android.synthetic.main.activity_refund.tv_btn_2
 import kotlinx.android.synthetic.main.activity_refund.tv_btn_3
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 
 class RefundActivity : Activity() {
+
+    fun getCurDateStr(format: String?): String? {
+        val c = Calendar.getInstance()
+        return date2Str(c, format)
+    }
+
+    fun date2Str(c: Calendar?, format: String?): String? {
+        return if (c == null) null else date2Str(
+            c.time,
+            format
+        )
+    }
+
+    fun date2Str(d: Date?, format: String?): String? {
+        var format = format
+        return if (d == null) {
+            null
+        } else {
+            if (format == null || format.length == 0) {
+                format = "yyyy-MM-dd HH:mm:ss"
+            }
+            val sdf = SimpleDateFormat(format)
+            sdf.format(d)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +62,8 @@ class RefundActivity : Activity() {
             val params = PaymentParams()
             params.transType = Constants.TRANS_TYPE_REFUND
             params.appId = "wz6012822ca2f1as78"
-            params.merchantOrderNo = merchantOrderNo
+            params.origMerchantOrderNo = merchantOrderNo
+            params.merchantOrderNo = "123" + getCurDateStr("yyyyMMddHHmmss")
             params.payMethod = "BANKCARD"
             params.transAmount = amount
             params.msgId = "111111"

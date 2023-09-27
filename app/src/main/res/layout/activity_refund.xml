@@ -14,7 +14,7 @@
         android:id="@+id/edit_input_merchant_order_no"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="请输入商户订单号" />
+        android:hint="请输入原商户订单号" />
 
     <TextView
         android:id="@+id/tv_btn_1"

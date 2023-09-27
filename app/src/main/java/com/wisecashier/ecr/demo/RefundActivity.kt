@@ -16,7 +16,7 @@ class RefundActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_payment)
+        setContentView(R.layout.activity_refund)
         tv_btn_2.setOnClickListener {
             finish()
         }
@@ -32,11 +32,11 @@ class RefundActivity : Activity() {
                 return@setOnClickListener
             }
             val params = PaymentParams()
-            params.transType = Constants.TRANS_TYPE_VOID
+            params.transType = Constants.TRANS_TYPE_REFUND
             params.appId = "wz6012822ca2f1as78"
             params.merchantOrderNo = merchantOrderNo
             params.payMethod = "BANKCARD"
-            params.transAmount = "2"
+            params.transAmount = amount
             params.msgId = "111111"
             val voiceData = params.voice_data
             voiceData.content = "AddpayCashier2 Received a new order"
@@ -46,7 +46,7 @@ class RefundActivity : Activity() {
                 tv_btn_3.text =
                     tv_btn_3.text.toString() + "\n" + "交易发送数据" + params.toJSON().toString()
             }
-            MainActivity.mClient.payment.purchase(params, object :
+            MainActivity.mClient.payment.refund(params, object :
                 ECRHubResponseCallBack {
                 override fun onError(errorCode: String?, errorMsg: String?) {
                     runOnUiThread {

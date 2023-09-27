@@ -28,7 +28,7 @@ public class Payment {
         if (null == params.getTopic()) {
             params.setTopic(PAYMENT_TOPIC);
         }
-        if(null == params.transType) {
+        if (null == params.transType) {
             params.setTransType(Constants.TRANS_TYPE_PURCHASE);
         }
         ECRHubRequestProto.VoiceData voiceData = null;
@@ -70,6 +70,9 @@ public class Payment {
         responseCallBack = callBack;
         if (null == params.getTopic()) {
             params.setTopic(PAYMENT_TOPIC);
+        }
+        if (null == params.transType) {
+            params.setTransType(Constants.TRANS_TYPE_REFUND);
         }
         ECRHubRequestProto.VoiceData voiceData = null;
         if (null != params.getVoice_data() && null != params.getVoice_data().getContent()) {

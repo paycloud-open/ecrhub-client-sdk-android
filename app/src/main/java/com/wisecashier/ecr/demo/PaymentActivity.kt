@@ -59,7 +59,7 @@ class PaymentActivity : Activity() {
             merchantOrderNo = "123" + getCurDateStr("yyyyMMddHHmmss")
             params.merchantOrderNo = merchantOrderNo
             params.payMethod = "BANKCARD"
-            params.transAmount = "2"
+            params.transAmount = amount
             params.msgId = "111111"
             val voiceData = params.voice_data
             voiceData.content = "AddpayCashier2 Received a new order"

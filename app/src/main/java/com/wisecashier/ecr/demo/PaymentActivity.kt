@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import com.wisecashier.ecr.sdk.client.payment.PaymentParams
 import com.wisecashier.ecr.sdk.listener.ECRHubResponseCallBack
+import com.wisecashier.ecr.sdk.util.Constants
 import kotlinx.android.synthetic.main.activity_payment.edit_input_amount
 import kotlinx.android.synthetic.main.activity_payment.tv_btn_1
 import kotlinx.android.synthetic.main.activity_payment.tv_btn_2
@@ -53,7 +54,7 @@ class PaymentActivity : Activity() {
                 return@setOnClickListener
             }
             val params = PaymentParams()
-            params.transType = 1
+            params.transType = Constants.TRANS_TYPE_PURCHASE
             params.appId = "wz6012822ca2f1as78"
             merchantOrderNo = "123" + getCurDateStr("yyyyMMddHHmmss")
             params.merchantOrderNo = merchantOrderNo

@@ -7,6 +7,7 @@ import static com.wisecashier.ecr.sdk.util.Constants.QUERY_TOPIC;
 
 import com.wiseasy.ecr.hub.data.ECRHubRequestProto;
 import com.wisecashier.ecr.sdk.listener.ECRHubResponseCallBack;
+import com.wisecashier.ecr.sdk.util.Constants;
 
 import org.java_websocket.client.WebSocketClient;
 
@@ -26,6 +27,9 @@ public class Payment {
         responseCallBack = callBack;
         if (null == params.getTopic()) {
             params.setTopic(PAYMENT_TOPIC);
+        }
+        if(null == params.transType) {
+            params.setTransType(Constants.TRANS_TYPE_PURCHASE);
         }
         ECRHubRequestProto.VoiceData voiceData = null;
         if (null != params.getVoice_data() && null != params.getVoice_data().getContent()) {

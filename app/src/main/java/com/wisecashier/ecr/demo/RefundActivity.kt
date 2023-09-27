@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import com.wisecashier.ecr.sdk.client.payment.PaymentParams
 import com.wisecashier.ecr.sdk.listener.ECRHubResponseCallBack
+import com.wisecashier.ecr.sdk.util.Constants
 import kotlinx.android.synthetic.main.activity_refund.edit_input_amount
 import kotlinx.android.synthetic.main.activity_refund.edit_input_merchant_order_no
 import kotlinx.android.synthetic.main.activity_refund.tv_btn_1
@@ -31,7 +32,7 @@ class RefundActivity : Activity() {
                 return@setOnClickListener
             }
             val params = PaymentParams()
-            params.transType = 2
+            params.transType = Constants.TRANS_TYPE_VOID
             params.appId = "wz6012822ca2f1as78"
             params.merchantOrderNo = merchantOrderNo
             params.payMethod = "BANKCARD"

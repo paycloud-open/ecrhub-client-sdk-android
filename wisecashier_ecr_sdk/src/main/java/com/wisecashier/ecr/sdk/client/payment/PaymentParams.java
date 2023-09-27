@@ -22,7 +22,7 @@ public class PaymentParams {
     /**
      * trans type
      */
-    int transType;
+    String transType;
     /**
      * payment method
      */
@@ -100,7 +100,7 @@ public class PaymentParams {
         return attach;
     }
 
-    public int getTransType() {
+    public String getTransType() {
         return transType;
     }
 
@@ -176,7 +176,7 @@ public class PaymentParams {
         this.transAmount = transAmount;
     }
 
-    public void setTransType(int transType) {
+    public void setTransType(String transType) {
         this.transType = transType;
     }
 

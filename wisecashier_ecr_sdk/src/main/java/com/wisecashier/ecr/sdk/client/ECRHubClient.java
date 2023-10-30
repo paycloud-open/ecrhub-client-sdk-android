@@ -3,6 +3,7 @@ package com.wisecashier.ecr.sdk.client;
 import static com.wisecashier.ecr.sdk.util.Constants.HEART_BEAT_TOPIC;
 import static com.wisecashier.ecr.sdk.util.Constants.INIT_TOPIC;
 
+import android.net.nsd.NsdManager;
 import android.os.Handler;
 import android.util.Log;
 

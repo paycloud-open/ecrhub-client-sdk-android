@@ -38,7 +38,7 @@ public class Payment {
         ECRHubRequestProto.RequestBizData bizData = ECRHubRequestProto.RequestBizData.newBuilder().setMerchantOrderNo(params.merchantOrderNo).setTransType("" + params.transType).setOrderAmount(params.transAmount).build();
         ECRHubRequestProto.ECRHubRequest data = ECRHubRequestProto.ECRHubRequest.newBuilder().setRequestId(params.msgId).setTopic(params.getTopic()).setVoiceData(voiceData).setBizData(bizData).setAppId(params.appId).build();
         if (null != webSocketClient && webSocketClient.isOpen()) {
-            webSocketClient.send(data.toByteString().toStringUtf8());
+            webSocketClient.send(data.toByteArray());
         }
     }
 
@@ -50,7 +50,7 @@ public class Payment {
         ECRHubRequestProto.RequestBizData bizData = ECRHubRequestProto.RequestBizData.newBuilder().setMerchantOrderNo(params.getMerchantOrderNo()).build();
         ECRHubRequestProto.ECRHubRequest data = ECRHubRequestProto.ECRHubRequest.newBuilder().setRequestId(params.msgId).setTopic(params.getTopic()).setBizData(bizData).setAppId(params.appId).build();
         if (null != webSocketClient && webSocketClient.isOpen()) {
-            webSocketClient.send(data.toByteString().toStringUtf8());
+            webSocketClient.send(data.toByteArray());
         }
     }
 
@@ -65,7 +65,7 @@ public class Payment {
         ECRHubRequestProto.RequestBizData bizData = ECRHubRequestProto.RequestBizData.newBuilder().setOrigMerchantOrderNo(params.getOrigMerchantOrderNo()).setMerchantOrderNo(params.merchantOrderNo).build();
         ECRHubRequestProto.ECRHubRequest data = ECRHubRequestProto.ECRHubRequest.newBuilder().setRequestId(params.msgId).setTopic(params.getTopic()).setBizData(bizData).setAppId(params.appId).build();
         if (null != webSocketClient && webSocketClient.isOpen()) {
-            webSocketClient.send(data.toByteString().toStringUtf8());
+            webSocketClient.send(data.toByteArray());
         }
     }
 
@@ -84,7 +84,7 @@ public class Payment {
         ECRHubRequestProto.RequestBizData bizData = ECRHubRequestProto.RequestBizData.newBuilder().setMerchantOrderNo(params.merchantOrderNo).setOrigMerchantOrderNo(params.origMerchantOrderNo).setPayMethodCategory(params.payMethod).setTransType("" + params.transType).setOrderAmount(params.transAmount).build();
         ECRHubRequestProto.ECRHubRequest data = ECRHubRequestProto.ECRHubRequest.newBuilder().setRequestId(params.msgId).setTopic(params.getTopic()).setVoiceData(voiceData).setBizData(bizData).setAppId(params.appId).build();
         if (null != webSocketClient && webSocketClient.isOpen()) {
-            webSocketClient.send(data.toByteString().toStringUtf8());
+            webSocketClient.send(data.toByteArray());
         }
     }
 }

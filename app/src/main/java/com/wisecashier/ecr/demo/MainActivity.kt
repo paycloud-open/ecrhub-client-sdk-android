@@ -4,35 +4,34 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.wisecashier.ecr.sdk.client.ECRHubClient
 import com.wisecashier.ecr.sdk.client.ECRHubConfig
+import com.wisecashier.ecr.sdk.jmdns.SearchServerListener
 import com.wisecashier.ecr.sdk.listener.ECRHubConnectListener
 import com.wisecashier.ecr.sdk.listener.ECRHubResponseCallBack
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : Activity(), ECRHubConnectListener {
+class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener {
     companion object {
         lateinit var mClient: ECRHubClient
     }
 
     var isConnected: Boolean = false
+    var ip = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val config = ECRHubConfig()
+        mClient = ECRHubClient(this, config, this)
         tv_btn_5.setOnClickListener {
-            if (isConnected) {
-                return@setOnClickListener
+            if (ip.isEmpty()) {
+                mClient.findServer(this@MainActivity)
+            } else {
+                mClient.autoConnect(ip)
             }
-            val text = edit_input_ip.text.toString()
-            if (text.isEmpty()) {
-                Toast.makeText(this, "请输入ip地址", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            mClient = ECRHubClient("ws://" + text, config, this)
-            mClient.connect()
         }
         tv_btn_8.setOnClickListener {
             mClient.disConnect()
@@ -108,6 +107,8 @@ class MainActivity : Activity(), ECRHubConnectListener {
     override fun onConnect() {
         Log.e("Test", "onConnect")
         runOnUiThread {
+            ll_layout1.visibility = View.VISIBLE
+            tv_btn_8.visibility = View.VISIBLE
             Toast.makeText(this, "连接成功", Toast.LENGTH_LONG).show()
         }
         isConnected = true
@@ -115,11 +116,30 @@ class MainActivity : Activity(), ECRHubConnectListener {
 
     override fun onDisconnect() {
         Log.e("Test", "onDisconnect")
+        runOnUiThread {
+            ll_layout1.visibility = View.GONE
+            tv_btn_8.visibility = View.GONE
+            Toast.makeText(this, "断开连接成功", Toast.LENGTH_LONG).show()
+        }
         isConnected = false
     }
 
     override fun onError(errorCode: String?, errorMsg: String?) {
         Log.e("Test", "onError")
         isConnected = false
+    }
+
+    override fun onServerFind(ip: String?, port: String?, deviceName: String?) {
+        runOnUiThread {
+            tv_btn_3.text =
+                tv_btn_3.text.toString() + "\n" + "发现了设备" + ip + ":" + port + "设备名称：" + deviceName
+            Toast.makeText(
+                this,
+                "发现了设备" + ip + ":" + port + "设备名称：" + deviceName,
+                Toast.LENGTH_LONG
+            ).show()
+            this.ip = "ws://" + ip + ":" + port
+            mClient.autoConnect(this.ip)
+        }
     }
 }

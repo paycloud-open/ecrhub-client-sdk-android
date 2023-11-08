@@ -1,34 +1,12 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.google.protobuf'
-apply plugin: 'maven'
-
-task androidSourcesJar(type: Jar) {
-    classifier = 'sources'
-    from android.sourceSets.main.java.srcDirs
-}
-//配置需要上传到maven仓库的文件
-artifacts {
-    archives androidSourcesJar
-}
-
-uploadArchives {
-    repositories.mavenDeployer {
-        // 配置本地仓库路径，项目根目录下的repository目录中
-        repository(url: "http://123.56.84.239:8070/nexus/content/repositories/snapshots") {
-            authentication(userName: "admin", password: "7oLumhcHWNzUXaF5QLXC")
-        }
-        pom.groupId = "com.wisecashier.ecr.sdk"// 唯一标识（通常为模块包名，也可以任意）
-        pom.artifactId = "android-sdk" // 项目名称（通常为类库模块名称，也可以任意）
-        pom.version = "1.0.1-SNAPSHOT"
-    }
-}
 
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
-        minSdkVersion 27
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0.0"
 
@@ -113,6 +91,7 @@ dependencies {
     api "com.squareup.okhttp3:okhttp:4.9.2"
     api 'androidx.appcompat:appcompat:1.0.0'
     api "com.squareup.okhttp3:logging-interceptor:4.9.2"
+    implementation group: 'org.jmdns', name: 'jmdns', version: '3.5.8'
     implementation 'com.googlecode.protobuf-java-format:protobuf-java-format:1.2'
     //retrofit2
     implementation 'org.java-websocket:Java-WebSocket:1.4.0'

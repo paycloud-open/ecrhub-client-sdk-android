@@ -3,6 +3,7 @@ package com.wisecashier.ecr.sdk.client;
 import static com.wisecashier.ecr.sdk.util.Constants.HEART_BEAT_TOPIC;
 import static com.wisecashier.ecr.sdk.util.Constants.INIT_TOPIC;
 
+import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.os.Handler;
 import android.util.Log;
@@ -14,6 +15,8 @@ import com.googlecode.protobuf.format.JsonFormat;
 import com.wiseasy.ecr.hub.data.ECRHubRequestProto;
 import com.wiseasy.ecr.hub.data.ECRHubResponseProto;
 import com.wisecashier.ecr.sdk.client.payment.Payment;
+import com.wisecashier.ecr.sdk.jmdns.JMdnsManager;
+import com.wisecashier.ecr.sdk.jmdns.SearchServerListener;
 import com.wisecashier.ecr.sdk.listener.ECRHubConnectListener;
 import com.wisecashier.ecr.sdk.listener.ECRHubResponseCallBack;
 import com.wisecashier.ecr.sdk.util.Base64Utils;
@@ -36,12 +39,13 @@ public class ECRHubClient {
     // listener
     private final ECRHubConnectListener connectListener;
     // server ip
-    private final String ipAddress;
+    private String ipAddress;
     private WebSocketClient webSocketClient;
 
     public Payment payment;
 
     private ECRHubResponseCallBack initCallback;
+    private JMdnsManager jmdnsManager;
 
 
     public ECRHubClient(String ip, ECRHubConfig config, ECRHubConnectListener listener) {
@@ -49,6 +53,22 @@ public class ECRHubClient {
         this.ipAddress = ip;
         this.connectListener = listener;
         initSocketClient();
+    }
+
+    public ECRHubClient(Context context, ECRHubConfig config, ECRHubConnectListener listener) {
+        this.config = config;
+        this.connectListener = listener;
+        jmdnsManager = new JMdnsManager(context);
+    }
+
+    public void autoConnect(String ip) {
+        this.ipAddress = ip;
+        initSocketClient();
+        connect();
+    }
+
+    public void findServer(SearchServerListener listener) {
+        jmdnsManager.searchServer(listener);
     }
 
     public void init(ECRHubResponseCallBack callBack) {

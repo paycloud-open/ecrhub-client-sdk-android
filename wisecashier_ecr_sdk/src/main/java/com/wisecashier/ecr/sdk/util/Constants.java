@@ -5,6 +5,15 @@ package com.wisecashier.ecr.sdk.util;
  */
 public class Constants {
     /**
+     * pair
+     */
+    //消息主题
+    public final static String ECR_HUB_TOPIC_PAIR = "ecrhub.pair";
+    /**
+     * unpair
+     */
+    public final static String ECR_HUB_TOPIC_UNPAIR = "ecrhub.unpair";
+    /**
      * init topic
      */
     public static final String INIT_TOPIC = "ecrhub.pay.init";

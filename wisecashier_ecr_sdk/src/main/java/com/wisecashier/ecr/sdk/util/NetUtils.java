@@ -3,6 +3,8 @@ package com.wisecashier.ecr.sdk.util;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -112,6 +114,13 @@ public class NetUtils {
         if (networkInfo != null && networkInfo.isConnected())
             return (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE);
         return false;
+    }
+
+    public static String getMacAddress(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        String macAddress = wifiInfo.getBSSID();
+        return macAddress;
     }
 
     /**

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import com.wisecashier.ecr.sdk.client.ECRHubClient
 import com.wisecashier.ecr.sdk.client.ECRHubConfig
@@ -73,6 +74,66 @@ class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener {
             startActivity(Intent(applicationContext, CloseActivity::class.java))
         }
 
+        tv_btn_9.setOnClickListener {
+            if (!isConnected) {
+                runOnUiThread {
+                    Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
+                }
+                return@setOnClickListener
+            }
+            tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "开始配对..."
+            /**
+             * 初始化连接接口
+             * @param url 服务器IP地址
+             * @param cackback 请求回调
+             */
+            mClient.requestPair("my", object :
+                ECRHubResponseCallBack {
+                override fun onError(errorCode: String?, errorMsg: String?) {
+                    runOnUiThread {
+                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "配对失败" + errorMsg
+                    }
+                }
+
+                override fun onSuccess(data: String?) {
+                    runOnUiThread {
+                        tv_btn_3.text =
+                            tv_btn_3.text.toString() + "\n" + "配对成功" + data.toString()
+                    }
+                }
+            })
+        }
+
+        tv_btn_10.setOnClickListener {
+            if (!isConnected) {
+                runOnUiThread {
+                    Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
+                }
+                return@setOnClickListener
+            }
+            tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "开始取消配对..."
+            /**
+             * 初始化连接接口
+             * @param url 服务器IP地址
+             * @param cackback 请求回调
+             */
+            mClient.requestUnPair("my", object :
+                ECRHubResponseCallBack {
+                override fun onError(errorCode: String?, errorMsg: String?) {
+                    runOnUiThread {
+                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "取消配对失败" + errorMsg
+                    }
+                }
+
+                override fun onSuccess(data: String?) {
+                    runOnUiThread {
+                        tv_btn_3.text =
+                            tv_btn_3.text.toString() + "\n" + "取消配对成功" + data.toString()
+                    }
+                }
+            })
+        }
+
         tv_btn_1.setOnClickListener {
             if (!isConnected) {
                 runOnUiThread {
@@ -80,7 +141,7 @@ class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener {
                 }
                 return@setOnClickListener
             }
-            tv_btn_3.text = "开始初始化..."
+            tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "开始初始化..."
             /**
              * 初始化连接接口
              * @param url 服务器IP地址

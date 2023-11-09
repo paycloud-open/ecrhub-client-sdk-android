@@ -47,8 +47,9 @@ public class ECRHubClient {
 
     public Payment payment;
     private ECRHubResponseCallBack initCallback;
-    private ECRHubResponseCallBack pairCallback;
     private JMdnsManager jmdnsManager;
+
+    ECRHubResponseCallBack pairCallBack;
 
     private Context context;
 
@@ -77,17 +78,19 @@ public class ECRHubClient {
     }
 
     public void requestPair(String deviceName, ECRHubResponseCallBack callBack) {
-        pairCallback = callBack;
+        pairCallBack = callBack;
         ECRHubRequestProto.RequestDeviceData deviceData = ECRHubRequestProto.RequestDeviceData.newBuilder().setDeviceName(deviceName).setMacAddress(NetUtils.getMacAddress(context)).build();
         ECRHubRequestProto.ECRHubRequest data = ECRHubRequestProto.ECRHubRequest.newBuilder().setTopic(ECR_HUB_TOPIC_PAIR).setDeviceData(deviceData).build();
         webSocketClient.send(data.toByteArray());
+
     }
 
     public void requestUnPair(String deviceName, ECRHubResponseCallBack callBack) {
-        pairCallback = callBack;
+        pairCallBack = callBack;
         ECRHubRequestProto.RequestDeviceData deviceData = ECRHubRequestProto.RequestDeviceData.newBuilder().setDeviceName(deviceName).setMacAddress(NetUtils.getMacAddress(context)).build();
         ECRHubRequestProto.ECRHubRequest data = ECRHubRequestProto.ECRHubRequest.newBuilder().setTopic(ECR_HUB_TOPIC_UNPAIR).setDeviceData(deviceData).build();
         webSocketClient.send(data.toByteArray());
+
     }
 
     public void init(ECRHubResponseCallBack callBack) {
@@ -120,9 +123,8 @@ public class ECRHubClient {
                     if (response.getTopic().equals(INIT_TOPIC)) {
                         ECRHubResponseProto.ResponseBizData initData = response.getBizData();
                         initCallback.onSuccess(JsonFormat.printToString(initData));
-                    }
-                    if (response.getTopic().equals(ECR_HUB_TOPIC_PAIR) || response.getTopic().equals(ECR_HUB_TOPIC_UNPAIR)) {
-                        pairCallback.onSuccess(JsonFormat.printToString(response));
+                    } else if (response.getTopic().equals(ECR_HUB_TOPIC_PAIR) || response.getTopic().equals(ECR_HUB_TOPIC_UNPAIR)) {
+                        pairCallBack.onSuccess(JsonFormat.printToString(response));
                     } else if (!response.getTopic().equals(HEART_BEAT_TOPIC)) {
                         if (null != payment && null != payment.getResponseCallBack()) {
                             payment.getResponseCallBack().onSuccess(JsonFormat.printToString(response));
@@ -141,6 +143,8 @@ public class ECRHubClient {
                     if (response.getTopic().equals(INIT_TOPIC)) {
                         ECRHubResponseProto.ResponseBizData initData = response.getBizData();
                         initCallback.onSuccess(JsonFormat.printToString(initData));
+                    } else if (response.getTopic().equals(ECR_HUB_TOPIC_PAIR) || response.getTopic().equals(ECR_HUB_TOPIC_UNPAIR)) {
+                        pairCallBack.onSuccess(JsonFormat.printToString(response));
                     } else if (!response.getTopic().equals(HEART_BEAT_TOPIC)) {
                         if (null != payment && null != payment.getResponseCallBack()) {
                             payment.getResponseCallBack().onSuccess(JsonFormat.printToString(response));

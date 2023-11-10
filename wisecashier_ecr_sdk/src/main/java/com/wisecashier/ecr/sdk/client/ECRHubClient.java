@@ -6,12 +6,10 @@ import static com.wisecashier.ecr.sdk.util.Constants.HEART_BEAT_TOPIC;
 import static com.wisecashier.ecr.sdk.util.Constants.INIT_TOPIC;
 
 import android.content.Context;
-import android.net.nsd.NsdManager;
 import android.os.Handler;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.googlecode.protobuf.format.JsonFormat;
 import com.wiseasy.ecr.hub.data.ECRHubRequestProto;
@@ -21,7 +19,6 @@ import com.wisecashier.ecr.sdk.jmdns.JMdnsManager;
 import com.wisecashier.ecr.sdk.jmdns.SearchServerListener;
 import com.wisecashier.ecr.sdk.listener.ECRHubConnectListener;
 import com.wisecashier.ecr.sdk.listener.ECRHubResponseCallBack;
-import com.wisecashier.ecr.sdk.util.Base64Utils;
 import com.wisecashier.ecr.sdk.util.NetUtils;
 
 import org.java_websocket.client.WebSocketClient;
@@ -29,7 +26,6 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.util.Objects;
 
 /**
  * @author pupan
@@ -74,7 +70,7 @@ public class ECRHubClient {
     }
 
     public void findServer(SearchServerListener listener) {
-        jmdnsManager.searchServer(listener);
+        jmdnsManager.startManualConnection(listener);
     }
 
     public void requestPair(String deviceName, ECRHubResponseCallBack callBack) {

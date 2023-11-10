@@ -5,24 +5,24 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/tv_btn_5"
+        android:id="@+id/tv_btn_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
         android:background="#FFFFFF"
         android:padding="10dp"
-        android:text="查找设备" />
+        android:text="Start Server Connection" />
 
     <TextView
-        android:id="@+id/tv_btn_8"
+        android:id="@+id/tv_btn_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
         android:background="#FFFFFF"
         android:padding="10dp"
-        android:text="断开连接"
+        android:text="DisConnect"
         android:visibility="gone" />
 
     <LinearLayout
@@ -33,7 +33,7 @@
         android:visibility="gone">
 
         <TextView
-            android:id="@+id/tv_btn_9"
+            android:id="@+id/tv_btn_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -43,7 +43,7 @@
             android:text="请求配对" />
 
         <TextView
-            android:id="@+id/tv_btn_10"
+            android:id="@+id/tv_btn_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -53,7 +53,7 @@
             android:text="取消配对" />
 
         <TextView
-            android:id="@+id/tv_btn_1"
+            android:id="@+id/tv_btn_5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -63,7 +63,7 @@
             android:text="初始化连接" />
 
         <TextView
-            android:id="@+id/tv_btn_2"
+            android:id="@+id/tv_btn_6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -73,7 +73,7 @@
             android:text="消费" />
 
         <TextView
-            android:id="@+id/tv_btn_6"
+            android:id="@+id/tv_btn_7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -83,7 +83,7 @@
             android:text="退款" />
 
         <TextView
-            android:id="@+id/tv_btn_7"
+            android:id="@+id/tv_btn_8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -93,7 +93,7 @@
             android:text="查询" />
 
         <TextView
-            android:id="@+id/tv_btn_4"
+            android:id="@+id/tv_btn_9"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -108,7 +108,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/tv_btn_3"
+            android:id="@+id/tv_text_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

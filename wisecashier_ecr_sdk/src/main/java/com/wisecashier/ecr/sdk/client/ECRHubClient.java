@@ -69,8 +69,12 @@ public class ECRHubClient {
         connect();
     }
 
-    public void findServer(SearchServerListener listener) {
+    public void startManualConnection(SearchServerListener listener) {
         jmdnsManager.startManualConnection(listener);
+    }
+
+    public void startServerConnect(String name) {
+        jmdnsManager.startServerConnect(name, this);
     }
 
     public void requestPair(String deviceName, ECRHubResponseCallBack callBack) {

@@ -25,19 +25,19 @@ public class ECRHubWebSocketServer extends WebSocketServer {
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         System.out.println("Connection closed");
+        onServerCallback.onClose();
         conn.close();
     }
 
     @Override
     public void onMessage(WebSocket conn, String message) {
         System.out.println("Received message: " + message);
-        onServerCallback.onMessageReceived(conn, message);
     }
 
     @Override
     public void onMessage(WebSocket conn, ByteBuffer message) {
         super.onMessage(conn, message);
-        onServerCallback.onMessageReceived(conn, message.toString());
+        onServerCallback.onMessageReceived(conn, message);
     }
 
     @Override

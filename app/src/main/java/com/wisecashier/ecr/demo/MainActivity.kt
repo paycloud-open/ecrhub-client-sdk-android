@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.WindowManager
+import android.view.View.OnClickListener
 import android.widget.Toast
 import com.wisecashier.ecr.sdk.client.ECRHubClient
 import com.wisecashier.ecr.sdk.client.ECRHubConfig
@@ -14,7 +14,7 @@ import com.wisecashier.ecr.sdk.listener.ECRHubConnectListener
 import com.wisecashier.ecr.sdk.listener.ECRHubResponseCallBack
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener {
+class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener, OnClickListener {
     companion object {
         lateinit var mClient: ECRHubClient
     }
@@ -27,149 +27,22 @@ class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener {
         setContentView(R.layout.activity_main)
         val config = ECRHubConfig()
         mClient = ECRHubClient(this, config, this)
-        tv_btn_5.setOnClickListener {
-            if (ip.isEmpty()) {
-                mClient.findServer(this@MainActivity)
-            } else {
-                mClient.autoConnect(ip)
-            }
-        }
-        tv_btn_8.setOnClickListener {
-            mClient.disConnect()
-        }
-        tv_btn_2.setOnClickListener {
-            if (!isConnected) {
-                runOnUiThread {
-                    Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
-                }
-                return@setOnClickListener
-            }
-            startActivity(Intent(applicationContext, PaymentActivity::class.java))
-        }
-        tv_btn_7.setOnClickListener {
-            if (!isConnected) {
-                runOnUiThread {
-                    Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
-                }
-                return@setOnClickListener
-            }
-            startActivity(Intent(applicationContext, QueryActivity::class.java))
-        }
-        tv_btn_6.setOnClickListener {
-            if (!isConnected) {
-                runOnUiThread {
-                    Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
-                }
-                return@setOnClickListener
-            }
-            startActivity(Intent(applicationContext, RefundActivity::class.java))
-        }
-        tv_btn_4.setOnClickListener {
-            if (!isConnected) {
-                runOnUiThread {
-                    Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
-                }
-                return@setOnClickListener
-            }
-            startActivity(Intent(applicationContext, CloseActivity::class.java))
-        }
-
-        tv_btn_9.setOnClickListener {
-            if (!isConnected) {
-                runOnUiThread {
-                    Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
-                }
-                return@setOnClickListener
-            }
-            tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "开始配对..."
-            /**
-             * 初始化连接接口
-             * @param url 服务器IP地址
-             * @param cackback 请求回调
-             */
-            mClient.requestPair("my", object :
-                ECRHubResponseCallBack {
-                override fun onError(errorCode: String?, errorMsg: String?) {
-                    runOnUiThread {
-                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "配对失败" + errorMsg
-                    }
-                }
-
-                override fun onSuccess(data: String?) {
-                    runOnUiThread {
-                        tv_btn_3.text =
-                            tv_btn_3.text.toString() + "\n" + "配对成功" + data.toString()
-                    }
-                }
-            })
-        }
-
-        tv_btn_10.setOnClickListener {
-            if (!isConnected) {
-                runOnUiThread {
-                    Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
-                }
-                return@setOnClickListener
-            }
-            tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "开始取消配对..."
-            /**
-             * 初始化连接接口
-             * @param url 服务器IP地址
-             * @param cackback 请求回调
-             */
-            mClient.requestUnPair("my", object :
-                ECRHubResponseCallBack {
-                override fun onError(errorCode: String?, errorMsg: String?) {
-                    runOnUiThread {
-                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "取消配对失败" + errorMsg
-                    }
-                }
-
-                override fun onSuccess(data: String?) {
-                    runOnUiThread {
-                        tv_btn_3.text =
-                            tv_btn_3.text.toString() + "\n" + "取消配对成功" + data.toString()
-                    }
-                }
-            })
-        }
-
-        tv_btn_1.setOnClickListener {
-            if (!isConnected) {
-                runOnUiThread {
-                    Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
-                }
-                return@setOnClickListener
-            }
-            tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "开始初始化..."
-            /**
-             * 初始化连接接口
-             * @param url 服务器IP地址
-             * @param cackback 请求回调
-             */
-            mClient.init(object :
-                ECRHubResponseCallBack {
-                override fun onError(errorCode: String?, errorMsg: String?) {
-                    runOnUiThread {
-                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "初始化失败" + errorMsg
-                    }
-                }
-
-                override fun onSuccess(data: String?) {
-                    runOnUiThread {
-                        tv_btn_3.text =
-                            tv_btn_3.text.toString() + "\n" + "初始化成功" + data.toString()
-                    }
-                }
-            })
-        }
+        tv_btn_1.setOnClickListener(this)
+        tv_btn_2.setOnClickListener(this)
+        tv_btn_3.setOnClickListener(this)
+        tv_btn_4.setOnClickListener(this)
+        tv_btn_5.setOnClickListener(this)
+        tv_btn_6.setOnClickListener(this)
+        tv_btn_7.setOnClickListener(this)
+        tv_btn_8.setOnClickListener(this)
+        tv_btn_9.setOnClickListener(this)
     }
 
     override fun onConnect() {
         Log.e("Test", "onConnect")
         runOnUiThread {
             ll_layout1.visibility = View.VISIBLE
-            tv_btn_8.visibility = View.VISIBLE
+            tv_btn_2.visibility = View.VISIBLE
             Toast.makeText(this, "连接成功", Toast.LENGTH_LONG).show()
         }
         isConnected = true
@@ -179,7 +52,7 @@ class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener {
         Log.e("Test", "onDisconnect")
         runOnUiThread {
             ll_layout1.visibility = View.GONE
-            tv_btn_8.visibility = View.GONE
+            tv_btn_2.visibility = View.GONE
             Toast.makeText(this, "断开连接成功", Toast.LENGTH_LONG).show()
         }
         isConnected = false
@@ -192,8 +65,8 @@ class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener {
 
     override fun onServerFind(ip: String?, port: String?, deviceName: String?) {
         runOnUiThread {
-            tv_btn_3.text =
-                tv_btn_3.text.toString() + "\n" + "发现了设备" + ip + ":" + port + "设备名称：" + deviceName
+            tv_text_1.text =
+                tv_text_1.text.toString() + "\n" + "发现了设备" + ip + ":" + port + "设备名称：" + deviceName
             Toast.makeText(
                 this,
                 "发现了设备" + ip + ":" + port + "设备名称：" + deviceName,
@@ -201,6 +74,136 @@ class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener {
             ).show()
             this.ip = "ws://" + ip + ":" + port
             mClient.autoConnect(this.ip)
+        }
+    }
+
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.tv_btn_1 -> {
+                mClient.startServerConnect("傻逼YK")
+            }
+
+            R.id.tv_btn_2 -> {
+                mClient.disConnect()
+            }
+
+            R.id.tv_btn_3 -> {
+                if (!isConnected) {
+                    runOnUiThread {
+                        Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
+                    }
+                    return
+                }
+                tv_text_1.text = tv_text_1.text.toString() + "\n" + "开始配对..."
+                mClient.requestPair("my", object :
+                    ECRHubResponseCallBack {
+                    override fun onError(errorCode: String?, errorMsg: String?) {
+                        runOnUiThread {
+                            tv_text_1.text =
+                                tv_text_1.text.toString() + "\n" + "配对失败" + errorMsg
+                        }
+                    }
+
+                    override fun onSuccess(data: String?) {
+                        runOnUiThread {
+                            tv_text_1.text =
+                                tv_text_1.text.toString() + "\n" + "配对成功" + data.toString()
+                        }
+                    }
+                })
+            }
+
+            R.id.tv_btn_4 -> {
+                if (!isConnected) {
+                    runOnUiThread {
+                        Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
+                    }
+                    return
+                }
+                tv_text_1.text = tv_text_1.text.toString() + "\n" + "开始取消配对..."
+                mClient.requestUnPair("傻逼YK", object :
+                    ECRHubResponseCallBack {
+                    override fun onError(errorCode: String?, errorMsg: String?) {
+                        runOnUiThread {
+                            tv_text_1.text =
+                                tv_text_1.text.toString() + "\n" + "取消配对失败" + errorMsg
+                        }
+                    }
+
+                    override fun onSuccess(data: String?) {
+                        runOnUiThread {
+                            tv_text_1.text =
+                                tv_text_1.text.toString() + "\n" + "取消配对成功" + data.toString()
+                        }
+                    }
+                })
+            }
+
+            R.id.tv_btn_5 -> {
+                if (!isConnected) {
+                    runOnUiThread {
+                        Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
+                    }
+                    return
+                }
+                tv_text_1.text = tv_text_1.text.toString() + "\n" + "开始初始化..."
+                mClient.init(object :
+                    ECRHubResponseCallBack {
+                    override fun onError(errorCode: String?, errorMsg: String?) {
+                        runOnUiThread {
+                            tv_text_1.text =
+                                tv_text_1.text.toString() + "\n" + "初始化失败" + errorMsg
+                        }
+                    }
+
+                    override fun onSuccess(data: String?) {
+                        runOnUiThread {
+                            tv_text_1.text =
+                                tv_text_1.text.toString() + "\n" + "初始化成功" + data.toString()
+                        }
+                    }
+                })
+            }
+
+            R.id.tv_btn_6 -> {
+                if (!isConnected) {
+                    runOnUiThread {
+                        Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
+                    }
+                    return
+                }
+                startActivity(Intent(applicationContext, PaymentActivity::class.java))
+            }
+
+            R.id.tv_btn_7 -> {
+                if (!isConnected) {
+                    runOnUiThread {
+                        Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
+                    }
+                    return
+                }
+                startActivity(Intent(applicationContext, RefundActivity::class.java))
+            }
+
+            R.id.tv_btn_8 -> {
+                if (!isConnected) {
+                    runOnUiThread {
+                        Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
+                    }
+                    return
+                }
+                startActivity(Intent(applicationContext, QueryActivity::class.java))
+            }
+
+            R.id.tv_btn_9 -> {
+                if (!isConnected) {
+                    runOnUiThread {
+                        Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
+                    }
+                    return
+                }
+                startActivity(Intent(applicationContext, CloseActivity::class.java))
+            }
         }
     }
 }

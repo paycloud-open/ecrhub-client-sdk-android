@@ -16,13 +16,13 @@ message ECRHubResponse {
   */
   string app_id = 3;
   /**
-  status
+  response code
  */
-  bool success = 4;
+  string response_code = 4;
   /**
-  error message
+  response message
   */
-  string error_msg = 5;
+  string response_msg = 5;
   /**
   Response Business Data
   */

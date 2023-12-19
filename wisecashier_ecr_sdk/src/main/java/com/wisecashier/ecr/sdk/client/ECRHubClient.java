@@ -16,7 +16,6 @@ import com.wiseasy.ecr.hub.data.ECRHubRequestProto;
 import com.wiseasy.ecr.hub.data.ECRHubResponseProto;
 import com.wisecashier.ecr.sdk.client.payment.Payment;
 import com.wisecashier.ecr.sdk.jmdns.JMdnsManager;
-import com.wisecashier.ecr.sdk.jmdns.SearchServerListener;
 import com.wisecashier.ecr.sdk.listener.ECRHubConnectListener;
 import com.wisecashier.ecr.sdk.listener.ECRHubResponseCallBack;
 import com.wisecashier.ecr.sdk.util.NetUtils;
@@ -67,10 +66,6 @@ public class ECRHubClient {
         this.ipAddress = ip;
         initSocketClient();
         connect();
-    }
-
-    public void startManualConnection(SearchServerListener listener) {
-        jmdnsManager.startManualConnection(listener);
     }
 
     public void startServerConnect(String name) {

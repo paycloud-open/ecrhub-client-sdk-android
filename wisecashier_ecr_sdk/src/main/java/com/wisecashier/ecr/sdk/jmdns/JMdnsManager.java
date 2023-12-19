@@ -22,10 +22,9 @@ import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 
-public class JMdnsManager implements ServiceListener, OnServerCallback {
+public class JMdnsManager implements OnServerCallback {
     private final static String CLIENT_REMOTE_TYPE = "_ecr-hub-client._tcp.local.";
     private static int PORT = 35779;
-    public final static String SERVER_REMOTE_TYPE = "_ecr-hub-server._tcp.local.";
 
     private Context context;
 
@@ -33,8 +32,6 @@ public class JMdnsManager implements ServiceListener, OnServerCallback {
 
     ECRHubWebSocketServer socketServer;
     private JmDNS mJmdns;
-
-    SearchServerListener mSearchServerListener;
 
     private boolean isServerStart = false;
 
@@ -54,41 +51,13 @@ public class JMdnsManager implements ServiceListener, OnServerCallback {
 
     public void startServerConnect(String name, ECRHubClient client) {
         deviceName = name;
+        this.client = client;
         if (!isServerStart) {
             if (null == socketServer) {
                 InetSocketAddress address = new InetSocketAddress(PORT);
                 socketServer = new ECRHubWebSocketServer(address, this);
             }
             socketServer.start();
-        }
-    }
-
-    public void startManualConnection(SearchServerListener listener) {
-        mSearchServerListener = listener;
-        if (null != mJmdns) {
-            mJmdns.addServiceListener(SERVER_REMOTE_TYPE, this);
-        }
-    }
-
-    @Override
-    public void serviceAdded(ServiceEvent event) {
-
-    }
-
-    @Override
-    public void serviceRemoved(ServiceEvent event) {
-
-    }
-
-    @Override
-    public void serviceResolved(ServiceEvent event) {
-        ServiceInfo info = event.getInfo();
-        if (null != info) {
-            String ipv4 = "";
-            if (null != info.getInet4Addresses()) {
-                ipv4 = info.getInet4Addresses()[0].getHostAddress();
-            }
-            mSearchServerListener.onServerFind(ipv4, "" + info.getPort(), info.getName());
         }
     }
 
@@ -129,7 +98,7 @@ public class JMdnsManager implements ServiceListener, OnServerCallback {
                 ECRHubResponseProto.ECRHubResponse responseData =
                         ECRHubResponseProto.ECRHubResponse.newBuilder()
                                 .setTopic(Constants.ECR_HUB_TOPIC_PAIR)
-                                .setSuccess(true).build();
+                                .setResponseCode("000").build();
                 connection.send(responseData.toByteArray());
             }
         } catch (InvalidProtocolBufferException e) {

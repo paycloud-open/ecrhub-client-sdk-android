@@ -9,18 +9,16 @@ import android.view.View.OnClickListener
 import android.widget.Toast
 import com.wisecashier.ecr.sdk.client.ECRHubClient
 import com.wisecashier.ecr.sdk.client.ECRHubConfig
-import com.wisecashier.ecr.sdk.jmdns.SearchServerListener
 import com.wisecashier.ecr.sdk.listener.ECRHubConnectListener
 import com.wisecashier.ecr.sdk.listener.ECRHubResponseCallBack
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener, OnClickListener {
+class MainActivity : Activity(), ECRHubConnectListener, OnClickListener {
     companion object {
         lateinit var mClient: ECRHubClient
     }
 
     var isConnected: Boolean = false
-    var ip = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +27,6 @@ class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener, On
         mClient = ECRHubClient(this, config, this)
         tv_btn_1.setOnClickListener(this)
         tv_btn_2.setOnClickListener(this)
-        tv_btn_3.setOnClickListener(this)
         tv_btn_4.setOnClickListener(this)
         tv_btn_5.setOnClickListener(this)
         tv_btn_6.setOnClickListener(this)
@@ -63,20 +60,6 @@ class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener, On
         isConnected = false
     }
 
-    override fun onServerFind(ip: String?, port: String?, deviceName: String?) {
-        runOnUiThread {
-            tv_text_1.text =
-                tv_text_1.text.toString() + "\n" + "发现了设备" + ip + ":" + port + "设备名称：" + deviceName
-            Toast.makeText(
-                this,
-                "发现了设备" + ip + ":" + port + "设备名称：" + deviceName,
-                Toast.LENGTH_LONG
-            ).show()
-            this.ip = "ws://" + ip + ":" + port
-            mClient.autoConnect(this.ip)
-        }
-    }
-
     override fun onClick(v: View) {
         when (v.id) {
             R.id.tv_btn_1 -> {
@@ -85,32 +68,6 @@ class MainActivity : Activity(), ECRHubConnectListener, SearchServerListener, On
 
             R.id.tv_btn_2 -> {
                 mClient.disConnect()
-            }
-
-            R.id.tv_btn_3 -> {
-                if (!isConnected) {
-                    runOnUiThread {
-                        Toast.makeText(this, "未连接服务器", Toast.LENGTH_LONG).show()
-                    }
-                    return
-                }
-                tv_text_1.text = tv_text_1.text.toString() + "\n" + "开始配对..."
-                mClient.requestPair("my", object :
-                    ECRHubResponseCallBack {
-                    override fun onError(errorCode: String?, errorMsg: String?) {
-                        runOnUiThread {
-                            tv_text_1.text =
-                                tv_text_1.text.toString() + "\n" + "配对失败" + errorMsg
-                        }
-                    }
-
-                    override fun onSuccess(data: String?) {
-                        runOnUiThread {
-                            tv_text_1.text =
-                                tv_text_1.text.toString() + "\n" + "配对成功" + data.toString()
-                        }
-                    }
-                })
             }
 
             R.id.tv_btn_4 -> {

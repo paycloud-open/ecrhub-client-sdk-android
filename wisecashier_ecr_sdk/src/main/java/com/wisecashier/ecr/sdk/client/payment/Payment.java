@@ -38,7 +38,7 @@ public class Payment {
         }
         data.getBiz_data().setMerchant_order_no(params.merchantOrderNo);
         data.getBiz_data().setTrans_type("" + params.transType);
-        data.getBiz_data().setOrder_amount(params.orderAmount);
+        data.getBiz_data().setOrder_amount(params.transAmount);
         data.getBiz_data().setConfirm_on_terminal(true);
         data.setRequest_id(params.msgId);
         data.setTopic(params.getTopic());
@@ -60,7 +60,7 @@ public class Payment {
         }
         data.getBiz_data().setMerchant_order_no(params.merchantOrderNo);
         data.getBiz_data().setTrans_type("" + params.transType);
-        data.getBiz_data().setOrder_amount(params.orderAmount);
+        data.getBiz_data().setOrder_amount(params.transAmount);
         data.getBiz_data().setConfirm_on_terminal(true);
         data.setRequest_id(params.msgId);
         data.setTopic(params.getTopic());
@@ -86,7 +86,7 @@ public class Payment {
         data.getBiz_data().setOrig_merchant_order_no(params.getOrigMerchantOrderNo());
         data.getBiz_data().setMerchant_order_no(params.merchantOrderNo);
         data.getBiz_data().setTrans_type("" + params.transType);
-        data.getBiz_data().setOrder_amount(params.orderAmount);
+        data.getBiz_data().setOrder_amount(params.transAmount);
         data.getBiz_data().setConfirm_on_terminal(true);
         data.setRequest_id(params.msgId);
         data.setTopic(params.getTopic());
@@ -112,7 +112,7 @@ public class Payment {
         data.getBiz_data().setOrig_merchant_order_no(params.getOrigMerchantOrderNo());
         data.getBiz_data().setMerchant_order_no(params.merchantOrderNo);
         data.getBiz_data().setTrans_type("" + params.transType);
-        data.getBiz_data().setOrder_amount(params.orderAmount);
+        data.getBiz_data().setOrder_amount(params.transAmount);
         data.getBiz_data().setConfirm_on_terminal(true);
         data.setRequest_id(params.msgId);
         data.setTopic(params.getTopic());

@@ -70,7 +70,9 @@ public class ECRHubClient {
     }
 
     public void closeServerConnect() {
-        jmdnsManager.unRegisterService();
+        if (null != jmdnsManager) {
+            jmdnsManager.unRegisterService();
+        }
     }
 
     public void requestUnPair(String deviceName, ECRHubResponseCallBack callBack) {
@@ -169,7 +171,7 @@ public class ECRHubClient {
     }
 
     public void disConnect() {
-        if (!webSocketClient.isOpen()) {
+        if (null == webSocketClient || !webSocketClient.isOpen()) {
             return;
         }
         webSocketClient.close();

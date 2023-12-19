@@ -74,6 +74,7 @@ class MainActivity : Activity(), ECRHubConnectListener, OnClickListener {
             R.id.tv_btn_10 -> {
                 mClient.disConnect()
                 mClient.closeServerConnect()
+                finish()
             }
 
             R.id.tv_btn_4 -> {

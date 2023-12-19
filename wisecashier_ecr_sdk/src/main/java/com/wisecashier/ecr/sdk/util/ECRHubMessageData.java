@@ -140,6 +140,9 @@ public class ECRHubMessageData {
     }
 
     public VoiceData getVoice_data() {
+        if(null==voice_data) {
+            voice_data = new VoiceData();
+        }
         return voice_data;
     }
 

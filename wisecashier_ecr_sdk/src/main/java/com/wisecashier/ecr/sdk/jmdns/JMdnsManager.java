@@ -70,6 +70,19 @@ public class JMdnsManager implements OnServerCallback {
         }
     }
 
+    public void unRegisterService() {
+        if (null != mJmdns) {
+            mJmdns.unregisterAllServices();
+        }
+        try {
+            socketServer.stop();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void onError(String errorMsg) {
         isServerStart = false;

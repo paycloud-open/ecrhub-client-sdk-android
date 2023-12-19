@@ -33,6 +33,7 @@ class MainActivity : Activity(), ECRHubConnectListener, OnClickListener {
         tv_btn_7.setOnClickListener(this)
         tv_btn_8.setOnClickListener(this)
         tv_btn_9.setOnClickListener(this)
+        tv_btn_10.setOnClickListener(this)
     }
 
     override fun onConnect() {
@@ -68,6 +69,11 @@ class MainActivity : Activity(), ECRHubConnectListener, OnClickListener {
 
             R.id.tv_btn_2 -> {
                 mClient.disConnect()
+            }
+
+            R.id.tv_btn_10 -> {
+                mClient.disConnect()
+                mClient.closeServerConnect()
             }
 
             R.id.tv_btn_4 -> {

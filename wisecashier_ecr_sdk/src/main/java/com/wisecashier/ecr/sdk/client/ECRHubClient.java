@@ -69,6 +69,10 @@ public class ECRHubClient {
         jmdnsManager.startServerConnect(name, this);
     }
 
+    public void closeServerConnect() {
+        jmdnsManager.unRegisterService();
+    }
+
     public void requestUnPair(String deviceName, ECRHubResponseCallBack callBack) {
         pairCallBack = callBack;
         ECRHubMessageData data = new ECRHubMessageData();

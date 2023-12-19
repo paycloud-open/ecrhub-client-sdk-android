@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.google.protobuf'
 
 android {
     compileSdkVersion 29
@@ -28,9 +27,6 @@ android {
         main {
             java {
                 srcDir 'src/main/java'
-            }
-            proto {
-                srcDir 'src/main/proto' //指定.proto文件路径
             }
         }
     }
@@ -65,25 +61,6 @@ buildscript {
         google()
         jcenter()
     }
-    dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.13'
-    }
-}
-
-protobuf {
-    protoc {
-        artifact = 'com.google.protobuf:protoc:3.21.1' // 也可以配置本地编译器路径
-    }
-    generateProtoTasks {
-        all().each { task ->
-            task.builtins {
-                remove java
-            }
-            task.builtins {
-                java {}// 生产java源码
-            }
-        }
-    }
 }
 
 dependencies {
@@ -92,10 +69,8 @@ dependencies {
     api 'androidx.appcompat:appcompat:1.0.0'
     api "com.squareup.okhttp3:logging-interceptor:4.9.2"
     implementation group: 'org.jmdns', name: 'jmdns', version: '3.5.8'
-    implementation 'com.googlecode.protobuf-java-format:protobuf-java-format:1.2'
     //retrofit2
     implementation 'org.java-websocket:Java-WebSocket:1.4.0'
     api 'com.squareup.retrofit2:retrofit:2.7.1'
     api 'org.ligboy.retrofit2:converter-fastjson-android:2.1.0'
-    implementation 'com.google.protobuf:protobuf-java:3.21.1'
 }

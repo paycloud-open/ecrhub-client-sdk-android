@@ -1,7 +1,5 @@
 package com.wisecashier.ecr.sdk.listener;
 
-import com.alibaba.fastjson.JSONObject;
-
 /**
  * api return callback
  * User: pupan

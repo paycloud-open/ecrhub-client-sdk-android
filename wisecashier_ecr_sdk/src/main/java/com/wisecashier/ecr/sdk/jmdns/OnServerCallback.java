@@ -28,6 +28,6 @@ public interface OnServerCallback {
      * @param connection
      * @param message
      */
-    void onMessageReceived(WebSocket connection, ByteBuffer message);
+    void onMessageReceived(WebSocket connection, String message);
 
 }

@@ -9,22 +9,19 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.googlecode.protobuf.format.JsonFormat;
-import com.wiseasy.ecr.hub.data.ECRHubRequestProto;
-import com.wiseasy.ecr.hub.data.ECRHubResponseProto;
 import com.wisecashier.ecr.sdk.client.payment.Payment;
 import com.wisecashier.ecr.sdk.jmdns.JMdnsManager;
 import com.wisecashier.ecr.sdk.listener.ECRHubConnectListener;
 import com.wisecashier.ecr.sdk.listener.ECRHubResponseCallBack;
+import com.wisecashier.ecr.sdk.util.ECRHubMessageData;
 import com.wisecashier.ecr.sdk.util.NetUtils;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
-import java.nio.ByteBuffer;
 
 /**
  * @author pupan
@@ -72,28 +69,24 @@ public class ECRHubClient {
         jmdnsManager.startServerConnect(name, this);
     }
 
-    public void requestPair(String deviceName, ECRHubResponseCallBack callBack) {
-        pairCallBack = callBack;
-        ECRHubRequestProto.RequestDeviceData deviceData = ECRHubRequestProto.RequestDeviceData.newBuilder().setDeviceName(deviceName).setMacAddress(NetUtils.getMacAddress(context)).build();
-        ECRHubRequestProto.ECRHubRequest data = ECRHubRequestProto.ECRHubRequest.newBuilder().setTopic(ECR_HUB_TOPIC_PAIR).setDeviceData(deviceData).build();
-        webSocketClient.send(data.toByteArray());
-
-    }
-
     public void requestUnPair(String deviceName, ECRHubResponseCallBack callBack) {
         pairCallBack = callBack;
-        ECRHubRequestProto.RequestDeviceData deviceData = ECRHubRequestProto.RequestDeviceData.newBuilder().setDeviceName(deviceName).setMacAddress(NetUtils.getMacAddress(context)).build();
-        ECRHubRequestProto.ECRHubRequest data = ECRHubRequestProto.ECRHubRequest.newBuilder().setTopic(ECR_HUB_TOPIC_UNPAIR).setDeviceData(deviceData).build();
-        webSocketClient.send(data.toByteArray());
+        ECRHubMessageData data = new ECRHubMessageData();
+        data.getDevice_data().setDevice_name(deviceName);
+        data.getDevice_data().setMac_address(NetUtils.getMacAddress(context));
+        data.setTopic(ECR_HUB_TOPIC_UNPAIR);
+        webSocketClient.send(JSON.toJSON(data).toString());
 
     }
 
     public void init(ECRHubResponseCallBack callBack) {
         initCallback = callBack;
         if (isConnected()) {
-            ECRHubRequestProto.RequestBizData bizData = ECRHubRequestProto.RequestBizData.newBuilder().setConfirmOnTerminal(true).setIsAutoSettlement(true).build();
-            ECRHubRequestProto.ECRHubRequest data = ECRHubRequestProto.ECRHubRequest.newBuilder().setTopic(INIT_TOPIC).setBizData(bizData).build();
-            webSocketClient.send(data.toByteArray());
+            ECRHubMessageData data = new ECRHubMessageData();
+            data.getBiz_data().setConfirm_on_terminal(true);
+            data.getBiz_data().setIs_auto_settlement(true);
+            data.setTopic(INIT_TOPIC);
+            webSocketClient.send(JSON.toJSON(data).toString());
         }
     }
 
@@ -113,40 +106,15 @@ public class ECRHubClient {
         webSocketClient = new WebSocketClient(uri) {
             @Override
             public void onMessage(String message) {
-                try {
-                    ECRHubResponseProto.ECRHubResponse response = ECRHubResponseProto.ECRHubResponse.parseFrom(message.getBytes());
-                    if (response.getTopic().equals(INIT_TOPIC)) {
-                        ECRHubResponseProto.ResponseBizData initData = response.getBizData();
-                        initCallback.onSuccess(JsonFormat.printToString(initData));
-                    } else if (response.getTopic().equals(ECR_HUB_TOPIC_PAIR) || response.getTopic().equals(ECR_HUB_TOPIC_UNPAIR)) {
-                        pairCallBack.onSuccess(JsonFormat.printToString(response));
-                    } else if (!response.getTopic().equals(HEART_BEAT_TOPIC)) {
-                        if (null != payment && null != payment.getResponseCallBack()) {
-                            payment.getResponseCallBack().onSuccess(JsonFormat.printToString(response));
-                        }
+                ECRHubMessageData data = JSON.parseObject(message, ECRHubMessageData.class);
+                if (data.getTopic().equals(INIT_TOPIC)) {
+                    initCallback.onSuccess(JSON.toJSON(data).toString());
+                } else if (data.getTopic().equals(ECR_HUB_TOPIC_PAIR) || data.getTopic().equals(ECR_HUB_TOPIC_UNPAIR)) {
+                    pairCallBack.onSuccess(JSON.toJSON(data).toString());
+                } else if (!data.getTopic().equals(HEART_BEAT_TOPIC)) {
+                    if (null != payment && null != payment.getResponseCallBack()) {
+                        payment.getResponseCallBack().onSuccess(JSON.toJSON(data).toString());
                     }
-                } catch (InvalidProtocolBufferException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-
-            @Override
-            public void onMessage(ByteBuffer bytes) {
-                try {
-                    ECRHubResponseProto.ECRHubResponse response = ECRHubResponseProto.ECRHubResponse.parseFrom(bytes);
-                    if (response.getTopic().equals(INIT_TOPIC)) {
-                        ECRHubResponseProto.ResponseBizData initData = response.getBizData();
-                        initCallback.onSuccess(JsonFormat.printToString(initData));
-                    } else if (response.getTopic().equals(ECR_HUB_TOPIC_PAIR) || response.getTopic().equals(ECR_HUB_TOPIC_UNPAIR)) {
-                        pairCallBack.onSuccess(JsonFormat.printToString(response));
-                    } else if (!response.getTopic().equals(HEART_BEAT_TOPIC)) {
-                        if (null != payment && null != payment.getResponseCallBack()) {
-                            payment.getResponseCallBack().onSuccess(JsonFormat.printToString(response));
-                        }
-                    }
-                } catch (InvalidProtocolBufferException e) {
-                    throw new RuntimeException(e);
                 }
             }
 

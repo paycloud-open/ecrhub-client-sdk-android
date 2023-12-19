@@ -2,11 +2,10 @@ package com.wisecashier.ecr.sdk.jmdns;
 
 import android.content.Context;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.wiseasy.ecr.hub.data.ECRHubRequestProto;
-import com.wiseasy.ecr.hub.data.ECRHubResponseProto;
+import com.alibaba.fastjson.JSON;
 import com.wisecashier.ecr.sdk.client.ECRHubClient;
 import com.wisecashier.ecr.sdk.util.Constants;
+import com.wisecashier.ecr.sdk.util.ECRHubMessageData;
 import com.wisecashier.ecr.sdk.util.NetUtils;
 
 import org.java_websocket.WebSocket;
@@ -14,13 +13,10 @@ import org.java_websocket.WebSocket;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
-import javax.jmdns.ServiceListener;
 
 public class JMdnsManager implements OnServerCallback {
     private final static String CLIENT_REMOTE_TYPE = "_ecr-hub-client._tcp.local.";
@@ -90,19 +86,12 @@ public class JMdnsManager implements OnServerCallback {
     }
 
     @Override
-    public void onMessageReceived(WebSocket connection, ByteBuffer message) {
-        try {
-            ECRHubRequestProto.ECRHubRequest data = ECRHubRequestProto.ECRHubRequest.parseFrom(message);
-            client.autoConnect("ws://" + data.getDeviceData().getIpAddress() + ":" + data.getDeviceData().getPort());
-            if (data.getTopic().equals(Constants.ECR_HUB_TOPIC_PAIR)) {
-                ECRHubResponseProto.ECRHubResponse responseData =
-                        ECRHubResponseProto.ECRHubResponse.newBuilder()
-                                .setTopic(Constants.ECR_HUB_TOPIC_PAIR)
-                                .setResponseCode("000").build();
-                connection.send(responseData.toByteArray());
-            }
-        } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException(e);
+    public void onMessageReceived(WebSocket connection, String message) {
+        ECRHubMessageData data = JSON.parseObject(message, ECRHubMessageData.class);
+        client.autoConnect("ws://" + data.getDevice_data().getIp_address() + ":" + data.getDevice_data().getPort());
+        if (data.getTopic().equals(Constants.ECR_HUB_TOPIC_PAIR)) {
+            data.setResponse_code("000");
+            connection.send(JSON.toJSON(data).toString());
         }
     }
 }

@@ -1,2 +1,2 @@
-include ':app', ':wisecashier_ecr_sdk'
-rootProject.name='wisecashier_ecr_sdk_demo'
+include ':app', ':codepay_register_sdk'
+rootProject.name='codepay_register_sdk_demo'

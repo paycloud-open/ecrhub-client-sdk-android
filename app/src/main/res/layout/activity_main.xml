@@ -22,8 +22,27 @@
         android:layout_marginTop="10dp"
         android:background="#FFFFFF"
         android:padding="10dp"
-        android:text="DisConnect"
-        android:visibility="gone" />
+        android:text="Connect" />
+
+    <TextView
+        android:id="@+id/tv_btn_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="#FFFFFF"
+        android:padding="10dp"
+        android:text="Disconnect" />
+
+    <TextView
+        android:id="@+id/tv_btn_5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="#FFFFFF"
+        android:padding="10dp"
+        android:text="UnPair" />
 
     <LinearLayout
         android:id="@+id/ll_layout1"
@@ -41,16 +60,6 @@
             android:background="#FFFFFF"
             android:padding="10dp"
             android:text="取消配对" />
-
-        <TextView
-            android:id="@+id/tv_btn_5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:background="#FFFFFF"
-            android:padding="10dp"
-            android:text="初始化连接" />
 
         <TextView
             android:id="@+id/tv_btn_6"

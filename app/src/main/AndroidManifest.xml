@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.wisecashier.ecr.demo">
+    package="com.codepay.register.sdk.demo">
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".MainActivity"
+            android:name="com.codepay.register.sdk.demo.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,9 +23,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PaymentActivity" />
-        <activity android:name=".CloseActivity" />
-        <activity android:name=".QueryActivity" />
-        <activity android:name=".RefundActivity" />
+        <activity android:name="com.codepay.register.sdk.demo.PaymentActivity" />
+        <activity android:name="com.codepay.register.sdk.demo.CloseActivity" />
+        <activity android:name="com.codepay.register.sdk.demo.QueryActivity" />
+        <activity android:name="com.codepay.register.sdk.demo.RefundActivity" />
     </application>
 </manifest>

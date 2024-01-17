@@ -1,6 +1,7 @@
 package com.codepay.register.sdk.device;
 
 import android.content.Context;
+import android.os.Build;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -24,7 +25,7 @@ import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
 
 public class ECRHubWebSocketDiscoveryService implements OnServerCallback {
-    private final static String CLIENT_REMOTE_TYPE = "_ecr-hub-client._tcp.local.";
+    private final static String REMOTE_CLIENT_TYPE = "_ecr-hub-client._tcp.local.";
     private static int PORT = 35779;
     private Context context;
     private String deviceName = "";
@@ -59,7 +60,7 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback {
     }
 
     public void start(ECRHubPairListener listener) {
-        deviceName = NetUtils.getMacAddress(context);
+        deviceName = Build.MODEL;
         pairListener = listener;
         if (!isServerStart) {
             if (null == socketServer) {
@@ -103,7 +104,7 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback {
         isServerStart = true;
         final HashMap<String, String> values = new HashMap<>();
         values.put("mac_address", NetUtils.getMacAddress(context));
-        ServiceInfo mServiceInfo = ServiceInfo.create(CLIENT_REMOTE_TYPE, deviceName, PORT, 0, 0, values);
+        ServiceInfo mServiceInfo = ServiceInfo.create(REMOTE_CLIENT_TYPE, deviceName, PORT, 0, 0, values);
         try {
             mJmdns.registerService(mServiceInfo);
         } catch (IOException e) {
@@ -131,7 +132,7 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback {
      *
      * @return paired list
      */
-    List<ECRHubDevice> getPairedDeviceList() {
+    public List<ECRHubDevice> getPairedDeviceList() {
         String deviceList = SharePreferenceUtil.getString(Constants.ECR_HUB_PAIR_LIST_KEY, "");
         List<ECRHubDevice> pairedDeviceList = new ArrayList();
         if (!deviceList.isEmpty()) {

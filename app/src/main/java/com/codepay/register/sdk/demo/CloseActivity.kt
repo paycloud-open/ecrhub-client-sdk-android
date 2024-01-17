@@ -20,7 +20,7 @@ class CloseActivity : Activity() {
         tv_btn_1.setOnClickListener {
             val merchantOrderNo = edit_input_merchant_order_no.text.toString()
             if (merchantOrderNo.isEmpty()) {
-                Toast.makeText(this, "请输入商户订单号", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "please input merchant order no", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             val params = PaymentParams()
@@ -31,14 +31,14 @@ class CloseActivity : Activity() {
                 ECRHubResponseCallBack {
                 override fun onError(errorCode: String?, errorMsg: String?) {
                     runOnUiThread {
-                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "交易失败" + errorMsg
+                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "Failure:" + errorMsg
                     }
                 }
 
                 override fun onSuccess(data: String?) {
                     runOnUiThread {
                         tv_btn_3.text =
-                            tv_btn_3.text.toString() + "\n" + "交易结果数据" + data.toString()
+                            tv_btn_3.text.toString() + "\n" + "result:" + data.toString()
                     }
                 }
 

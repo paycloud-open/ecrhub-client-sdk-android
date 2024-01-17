@@ -50,7 +50,7 @@ class PaymentActivity : Activity() {
         tv_btn_1.setOnClickListener {
             val amount = edit_input_amount.text.toString()
             if (amount.isEmpty()) {
-                Toast.makeText(this, "请输入地址", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Please input amount", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             val params = PaymentParams()
@@ -66,20 +66,20 @@ class PaymentActivity : Activity() {
             params.voice_data = voiceData
             runOnUiThread {
                 tv_btn_3.text =
-                    tv_btn_3.text.toString() + "\n" + "交易发送数据" + params.toJSON().toString()
+                    tv_btn_3.text.toString() + "\n" + "Send data:" + params.toJSON().toString()
             }
             MainActivity.mClient.payment.purchase(params, object :
                 ECRHubResponseCallBack {
                 override fun onError(errorCode: String?, errorMsg: String?) {
                     runOnUiThread {
-                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "交易失败" + errorMsg
+                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "Failure:" + errorMsg
                     }
                 }
 
                 override fun onSuccess(data: String?) {
                     runOnUiThread {
                         tv_btn_3.text =
-                            tv_btn_3.text.toString() + "\n" + "交易结果数据" + data.toString()
+                            tv_btn_3.text.toString() + "\n" + "Result:" + data.toString()
                     }
                 }
             })

@@ -127,6 +127,11 @@ public class ECRHubClient {
         webSocketClient.connect();
     }
 
+    public void connect(String ip) {
+        ipAddress = ip;
+        connect();
+    }
+
     public void disConnect() {
         if (null == webSocketClient || !webSocketClient.isOpen()) {
             return;

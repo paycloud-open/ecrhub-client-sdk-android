@@ -51,12 +51,12 @@ class RefundActivity : Activity() {
         tv_btn_1.setOnClickListener {
             val amount = edit_input_amount.text.toString()
             if (amount.isEmpty()) {
-                Toast.makeText(this, "请输入地址", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Please input amount", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             val merchantOrderNo = edit_input_merchant_order_no.text.toString()
             if (merchantOrderNo.isEmpty()) {
-                Toast.makeText(this, "请输入商户订单号", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Please input merchant order no", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             val params = PaymentParams()
@@ -73,7 +73,7 @@ class RefundActivity : Activity() {
             params.voice_data = voiceData
             runOnUiThread {
                 tv_btn_3.text =
-                    tv_btn_3.text.toString() + "\n" + "交易发送数据" + params.toJSON().toString()
+                    tv_btn_3.text.toString() + "\n" + "Send data" + params.toJSON().toString()
             }
             MainActivity.mClient.payment.refund(params, object :
                 ECRHubResponseCallBack {
@@ -86,7 +86,7 @@ class RefundActivity : Activity() {
                 override fun onSuccess(data: String?) {
                     runOnUiThread {
                         tv_btn_3.text =
-                            tv_btn_3.text.toString() + "\n" + "交易结果数据" + data.toString()
+                            tv_btn_3.text.toString() + "\n" + "Result:" + data.toString()
                     }
                 }
             })

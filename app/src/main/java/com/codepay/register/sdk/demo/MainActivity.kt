@@ -128,6 +128,7 @@ class MainActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
                     }
 
                     override fun onSuccess(data: String?) {
+                        mClient.disConnect()
                         runOnUiThread {
                             ll_layout1.visibility = View.GONE
                             Toast.makeText(this@MainActivity, "Unpair Success!", Toast.LENGTH_LONG)

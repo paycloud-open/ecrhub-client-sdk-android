@@ -5,6 +5,7 @@ import android.os.Build;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.codepay.register.sdk.client.ECRHubClient;
 import com.codepay.register.sdk.listener.ECRHubPairListener;
 import com.codepay.register.sdk.util.Constants;
@@ -102,9 +103,9 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback {
     @Override
     public void onServerStart() {
         isServerStart = true;
-        final HashMap<String, String> values = new HashMap<>();
-        values.put("mac_address", NetUtils.getMacAddress(context));
-        ServiceInfo mServiceInfo = ServiceInfo.create(REMOTE_CLIENT_TYPE, deviceName, PORT, 0, 0, values);
+        final JSONObject clientInfo = new JSONObject();
+        clientInfo.put("mac_address", NetUtils.getMacAddress(context));
+        ServiceInfo mServiceInfo = ServiceInfo.create(REMOTE_CLIENT_TYPE, deviceName, PORT, 0, 0, clientInfo.toJSONString());
         try {
             mJmdns.registerService(mServiceInfo);
         } catch (IOException e) {
@@ -198,6 +199,11 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback {
     public void onMessageReceived(WebSocket connection, String message) {
         this.connection = connection;
         ECRHubMessageData data = JSON.parseObject(message, ECRHubMessageData.class);
-        pairListener.onDevicePair(data, "ws://" + data.getDevice_data().getIp_address() + ":" + data.getDevice_data().getPort());
+        if (data.getTopic().equals(Constants.ECR_HUB_TOPIC_UNPAIR)) {
+            data.setResponse_code("000");
+            connection.send(JSON.toJSON(data).toString());
+        } else {
+            pairListener.onDevicePair(data, "ws://" + data.getDevice_data().getIp_address() + ":" + data.getDevice_data().getPort());
+        }
     }
 }

@@ -51,7 +51,6 @@ class MainActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
         Log.e("Test", "onConnect")
         runOnUiThread {
             ll_layout1.visibility = View.VISIBLE
-            tv_btn_2.visibility = View.VISIBLE
             Toast.makeText(this, "Connect Success!", Toast.LENGTH_LONG).show()
         }
         isConnected = true
@@ -61,7 +60,6 @@ class MainActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
         Log.e("Test", "onDisconnect")
         runOnUiThread {
             ll_layout1.visibility = View.GONE
-            tv_btn_2.visibility = View.GONE
             Toast.makeText(this, "Disconnect Success!", Toast.LENGTH_LONG).show()
         }
         isConnected = false
@@ -71,7 +69,6 @@ class MainActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
         Log.e("Test", "onError")
         runOnUiThread {
             ll_layout1.visibility = View.GONE
-            tv_btn_2.visibility = View.GONE
             Toast.makeText(this, "Connect Error:$errorMsg", Toast.LENGTH_LONG).show()
         }
         isConnected = false
@@ -177,21 +174,23 @@ class MainActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
     }
 
     override fun onDevicePair(data: ECRHubMessageData?, ip: String?) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Pair Device")
-        builder.setMessage("Are you pair the " + data?.device_data?.device_name + " device?")
-        builder.setCancelable(false)
-        builder.setPositiveButton(
-            "Pair"
-        ) { p0, _ ->
-            mPairServer?.confirmPair(data)
-            ECRHubClient.getInstance().connect(ip)
-            p0?.dismiss()
+        runOnUiThread {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Pair Device")
+            builder.setMessage("Are you pair the " + data?.device_data?.device_name + " device?")
+            builder.setCancelable(false)
+            builder.setPositiveButton(
+                "Pair"
+            ) { p0, _ ->
+                mPairServer?.confirmPair(data)
+                ECRHubClient.getInstance().connect(ip)
+                p0?.dismiss()
+            }
+            builder.setNegativeButton("Cancel") { p0, _ ->
+                mPairServer?.cancelPair(data)
+                p0?.dismiss()
+            }
+            builder.show()
         }
-        builder.setNegativeButton("Cancel") { p0, _ ->
-            mPairServer?.cancelPair(data)
-            p0?.dismiss()
-        }
-        builder.show()
     }
 }

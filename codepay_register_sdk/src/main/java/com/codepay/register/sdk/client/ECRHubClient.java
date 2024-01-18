@@ -14,6 +14,7 @@ import com.codepay.register.sdk.listener.ECRHubResponseCallBack;
 import com.codepay.register.sdk.util.ECRHubMessageData;
 
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.enums.ReadyState;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
@@ -124,7 +125,11 @@ public class ECRHubClient {
         if (webSocketClient.isOpen()) {
             return;
         }
-        webSocketClient.connect();
+        if (webSocketClient.getReadyState().equals(ReadyState.NOT_YET_CONNECTED)) {
+            webSocketClient.connect();
+        } else if (webSocketClient.getReadyState().equals(ReadyState.CLOSING) || webSocketClient.getReadyState().equals(ReadyState.CLOSED)) {
+            webSocketClient.reconnect();
+        }
     }
 
     public void connect(String ip) {

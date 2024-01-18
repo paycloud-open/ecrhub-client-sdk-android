@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.codepay.register.sdk.client.ECRHubClient;
 import com.codepay.register.sdk.listener.ECRHubPairListener;
+import com.codepay.register.sdk.listener.ECRHubResponseCallBack;
 import com.codepay.register.sdk.util.Constants;
 import com.codepay.register.sdk.util.ECRHubMessageData;
 import com.codepay.register.sdk.util.NetUtils;
@@ -75,7 +76,9 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback {
     public void stop() {
         try {
             if (null != mJmdns) {
+                mJmdns.close();
                 mJmdns.unregisterAllServices();
+                mJmdns = null;
             }
             socketServer.stop();
         } catch (Exception e) {
@@ -83,7 +86,7 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback {
         }
     }
 
-    public void unPair(ECRHubDevice device) {
+    public void unPair(ECRHubDevice device, ECRHubResponseCallBack callBack) {
         String deviceList = SharePreferenceUtil.getString(Constants.ECR_HUB_PAIR_LIST_KEY, "");
         if (!deviceList.isEmpty()) {
             JSONArray array = JSON.parseArray(deviceList);
@@ -96,7 +99,14 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback {
             }
             SharePreferenceUtil.put(Constants.ECR_HUB_PAIR_LIST_KEY, array.toString());
         }
-        ECRHubClient.getInstance().requestUnPair(device, null);
+        if (deviceName.isEmpty()) {
+            deviceName = Build.MODEL;
+        }
+        device.setName(deviceName);
+        device.setWs_address(NetUtils.getMacAddress(context));
+        device.setPort("" + PORT);
+        device.setIp_address(NetUtils.getLocalIPAddress().getHostAddress());
+        ECRHubClient.getInstance().requestUnPair(device, callBack);
     }
 
 

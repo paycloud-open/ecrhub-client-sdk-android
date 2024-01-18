@@ -14,6 +14,7 @@ import com.codepay.register.sdk.device.ECRHubDevice
 import com.codepay.register.sdk.device.ECRHubWebSocketDiscoveryService
 import com.codepay.register.sdk.listener.ECRHubConnectListener
 import com.codepay.register.sdk.listener.ECRHubPairListener
+import com.codepay.register.sdk.listener.ECRHubResponseCallBack
 import com.codepay.register.sdk.util.ECRHubMessageData
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -109,20 +110,32 @@ class MainActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
             }
 
             R.id.tv_btn_5 -> {
-                if (mPairedList.isEmpty()) {
+                if (!isConnected) {
                     runOnUiThread {
-                        Toast.makeText(this, "Paired list is empty", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Server is not connect", Toast.LENGTH_LONG).show()
                     }
                     return
                 }
+                mPairServer?.unPair(mPairedList[0], object : ECRHubResponseCallBack {
+                    override fun onError(errorCode: String?, errorMsg: String?) {
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "unPair failure:$errorMsg",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
 
-                if (isConnected) {
-                    runOnUiThread {
-                        Toast.makeText(this, "Server is connect", Toast.LENGTH_LONG).show()
+                    override fun onSuccess(data: String?) {
+                        runOnUiThread {
+                            ll_layout1.visibility = View.GONE
+                            Toast.makeText(this@MainActivity, "Unpair Success!", Toast.LENGTH_LONG)
+                                .show()
+                        }
                     }
-                    return
-                }
-                mPairServer?.unPair(mPairedList[0])
+
+                })
             }
 
             R.id.tv_btn_10 -> {

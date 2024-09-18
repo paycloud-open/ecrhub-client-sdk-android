@@ -11,7 +11,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath 'com.android.tools.build:gradle:3.5.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -28,10 +28,10 @@ allprojects {
         google()
         jcenter()
         maven {
-            url 'http://123.56.84.239:8070/nexus/content/groups/public'
-        }
-        maven {
             url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
+        }
+        flatDir {
+            dirs project(':wiseasy_ecr_sdk').file('libs')
         }
     }
 }

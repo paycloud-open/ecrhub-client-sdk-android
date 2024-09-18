@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,17 +10,10 @@
         android:id="@+id/edit_input_amount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Please input amount"
+        android:digits="1234567890."
+        android:hint="@string/OrderAmount"
         android:inputType="number"
-        android:padding="10dp" />
-
-    <EditText
-        android:id="@+id/edit_input_tip_amount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Please input tip amount"
-        android:inputType="number"
-        android:padding="10dp" />
+        android:padding="10dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,7 +26,7 @@
             android:layout_height="wrap_content"
             android:checked="false"
             android:padding="10dp"
-            android:text="Confirm on terminal" />
+            android:text="@string/confirm_on_terminal" />
 
         <View
             android:layout_width="30dp"
@@ -44,7 +38,8 @@
             android:layout_height="wrap_content"
             android:checked="false"
             android:padding="10dp"
-            android:text="Screen tip" />
+            android:text="@string/screen_tip" />
+
 
     </LinearLayout>
 
@@ -62,40 +57,39 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Print:"
+                android:text="@string/print"
                 android:textColor="#000000" />
-
             <RadioButton
                 android:id="@+id/option_0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="No print" />
+                android:text="@string/no_print" />
 
             <RadioButton
                 android:id="@+id/option_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Merchant" />
+                android:text="@string/merchant" />
 
             <RadioButton
                 android:id="@+id/option_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CardHolder" />
+                android:text="@string/cardholder" />
 
             <RadioButton
                 android:id="@+id/option_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="All" />
+                android:text="@string/all" />
         </RadioGroup>
     </LinearLayout>
 
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/tv_btn_1"
@@ -103,11 +97,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:background="#FFFFFF"
             android:textColor="#000000"
+            android:background="#FFFFFF"
             android:gravity="center"
             android:padding="10dp"
-            android:text="Sale" />
+            android:text="@string/Auth" />
 
         <View
             android:layout_width="20dp"
@@ -123,7 +117,7 @@
             android:textColor="#000000"
             android:gravity="center"
             android:padding="10dp"
-            android:text="Close Order" />
+            android:text="@string/Close" />
     </LinearLayout>
 
     <TextView
@@ -136,7 +130,7 @@
         android:textColor="#000000"
         android:gravity="center"
         android:padding="10dp"
-        android:text="Back" />
+        android:text="@string/back" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="wrap_content"

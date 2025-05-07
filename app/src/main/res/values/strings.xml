@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RegisterECRDemo</string>
+    <string name="app_name">ECRDemo</string>
     <string name="Save">Save</string>
     <string name="Sale">Sale</string>
     <string name="Refund">Refund</string>

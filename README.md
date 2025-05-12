@@ -34,7 +34,7 @@ allprojects {
 ```java
 
 dependencies {
-                implementation 'com.github.paycloud-open:ecr-hub-client-sdk-android:1.0.3'
+                implementation 'com.github.paycloud-open:ecrhub-client-sdk-android:1.0.3'
         }
 ```
 

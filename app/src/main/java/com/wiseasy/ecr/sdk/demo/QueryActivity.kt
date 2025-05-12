@@ -4,10 +4,9 @@ import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
 import com.alibaba.fastjson.JSON
-import com.wiseasy.ecr.sdk.client.ECRHubClient
-import com.wiseasy.ecr.sdk.client.payment.PaymentRequestParams
-import com.wiseasy.ecr.sdk.client.payment.PaymentResponseParams
-import com.wiseasy.ecr.sdk.listener.ECRHubResponseCallBack
+import com.wiseasy.ecr.sdk.EcrClient
+import com.wiseasy.ecr.sdk.listener.EcrResponseCallBack
+import com.wiseasy.ecr.sdk.util.Constants
 import kotlinx.android.synthetic.main.activity_query.edit_input_merchant_order_no
 import kotlinx.android.synthetic.main.activity_query.tv_btn_1
 import kotlinx.android.synthetic.main.activity_query.tv_btn_2
@@ -15,49 +14,52 @@ import kotlinx.android.synthetic.main.activity_query.tv_btn_3
 
 class QueryActivity : Activity() {
 
-    companion object {
-        lateinit var mClient: ECRHubClient
-    }
+    private val mClient = EcrClient.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_query)
+
         val sharedPreferences = getSharedPreferences(packageName, MODE_PRIVATE)
+        val no = sharedPreferences.getString("merchant_order_no", "")
+        edit_input_merchant_order_no.setText(no)
+
+
         tv_btn_2.setOnClickListener {
             finish()
         }
         tv_btn_1.setOnClickListener {
             val merchantOrderNo = edit_input_merchant_order_no.text.toString()
-            val params =
-                PaymentRequestParams()
+
             if (merchantOrderNo.isEmpty()) {
-                if (sharedPreferences.getString("merchant_order_no", "").toString().isEmpty()) {
-                    Toast.makeText(this, "Please input merchant order no", Toast.LENGTH_LONG)
-                        .show()
-                    return@setOnClickListener
-                } else {
-                    params.orig_merchant_order_no =
-                        sharedPreferences.getString("merchant_order_no", "").toString()
-                }
-            } else {
-                params.merchant_order_no = merchantOrderNo
+                Toast.makeText(this, "Please input merchant order no", Toast.LENGTH_LONG)
+                    .show()
+                return@setOnClickListener
             }
+
+            val params = PaymentRequestParams()
             params.app_id = "wz6012822ca2f1as78"
+            params.topic = Constants.QUERY_TOPIC
+            params.biz_data = PaymentRequestParams.BizData()
+            params.biz_data.merchant_order_no = merchantOrderNo
+
+            val json = JSON.toJSONString(params)
+
             runOnUiThread {
-                tv_btn_3.text =
-                    "Send Query data --> " + params.toJSON().toString()
+                tv_btn_3.text = "Send Query data -->\n$json"
             }
-            mClient.payment.query(params, object :
-                ECRHubResponseCallBack {
+
+            mClient.queryTransaction(json, object :
+                EcrResponseCallBack {
                 override fun onError(errorCode: String?, errorMsg: String?) {
                     runOnUiThread {
-                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "Failure:" + errorMsg
+                        tv_btn_3.text = tv_btn_3.text.toString() + "\nFailure -->\n" + errorMsg
                     }
                 }
 
-                override fun onSuccess(data: PaymentResponseParams?) {
+                override fun onSuccess(data: String) {
                     runOnUiThread {
-                        tv_btn_3.text =
-                            tv_btn_3.text.toString() + "\n" + "Result:" + JSON.toJSON(data)
+                        tv_btn_3.text = tv_btn_3.text.toString() + "\nReceive Query Result -->\n" + data
                     }
                 }
 

@@ -7,40 +7,37 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
 import android.widget.Toast
-import com.wiseasy.ecr.sdk.client.ECRHubClient
-import com.wiseasy.ecr.sdk.client.ECRHubConfig
-import com.wiseasy.ecr.sdk.client.payment.PaymentResponseParams
-import com.wiseasy.ecr.sdk.device.ECRHubDevice
-import com.wiseasy.ecr.sdk.device.ECRHubWebSocketDiscoveryService
-import com.wiseasy.ecr.sdk.listener.ECRHubConnectListener
-import com.wiseasy.ecr.sdk.listener.ECRHubPairListener
-import com.wiseasy.ecr.sdk.listener.ECRHubResponseCallBack
-import com.wiseasy.ecr.sdk.util.Constants
-import com.wiseasy.ecr.sdk.util.ECRHubMessageData
+import androidx.annotation.RequiresApi
+import com.wiseasy.ecr.sdk.EcrClient
+import com.wiseasy.ecr.sdk.EcrWifiDiscoveryService
+import com.wiseasy.ecr.sdk.listener.EcrConnectListener
+import com.wiseasy.ecr.sdk.listener.EcrPairListener
+import com.wiseasy.ecr.sdk.bean.EcrMessageData
 import kotlinx.android.synthetic.main.activity_wlan.*
 
-class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubPairListener {
-    companion object {
-        lateinit var mClient: ECRHubClient
-    }
-    private var mPairServer: ECRHubWebSocketDiscoveryService? = null
-    private var mPairedList = mutableListOf<ECRHubDevice>()
+class WLanActivity : Activity(), EcrConnectListener, OnClickListener,
+    EcrPairListener {
+
+    private val TAG = "WLanActivity"
+
+    private var discoveryService: EcrWifiDiscoveryService? = null
+    private val mClient = EcrClient.getInstance()
+
     private var isConnected: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wlan)
 
-        val config = ECRHubConfig()
-        mClient = ECRHubClient.getInstance()
-        mClient.init(config, this, this, Constants.ECRHubType.WLAN)
-        mPairServer = ECRHubWebSocketDiscoveryService(this)
-        mPairedList = mPairServer!!.pairedDeviceList
+
+        mClient.init(this, this)
+        discoveryService = EcrWifiDiscoveryService(this)
         tv_btn_start.setOnClickListener(this)
         tv_btn_connect.setOnClickListener(this)
         tv_btn_disconnect.setOnClickListener(this)
@@ -51,21 +48,31 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
         tv_btn_complete.setOnClickListener(this)
         tv_btn_cashback.setOnClickListener(this)
         tv_btn_query.setOnClickListener(this)
-        tv_btn_close.setOnClickListener(this)
         tv_btn_exit.setOnClickListener(this)
+
+        val mPairedList = discoveryService!!.pairedDeviceList
+        if (mPairedList.isNotEmpty()) {
+            val ip = "ws://" + mPairedList[0].ip_address + ":" + mPairedList[0].port
+            tv_text_1.text = "paired $ip"
+        }
+
+
     }
 
     override fun onConnect() {
-        Log.e("Test", "onConnect")
+        Log.e(TAG, "onConnect")
         runOnUiThread {
             ll_layout1.visibility = View.VISIBLE
+            val mPairedList = discoveryService!!.pairedDeviceList
+            val ip = "ws://" + mPairedList[0].ip_address + ":" + mPairedList[0].port
+            tv_text_1.text = "connect $ip"
             Toast.makeText(this, "Connect Success!", Toast.LENGTH_LONG).show()
         }
         isConnected = true
     }
 
     override fun onDisconnect() {
-        Log.e("Test", "onDisconnect")
+        Log.e(TAG, "onDisconnect")
         runOnUiThread {
             ll_layout1.visibility = View.GONE
             Toast.makeText(this, "Disconnect Success!", Toast.LENGTH_LONG).show()
@@ -74,7 +81,7 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
     }
 
     override fun onError(errorCode: String?, errorMsg: String?) {
-        Log.e("Test", "onError")
+        Log.e(TAG, "onError")
         runOnUiThread {
             ll_layout1.visibility = View.GONE
             Toast.makeText(this, "Connect Error:$errorMsg", Toast.LENGTH_LONG).show()
@@ -82,6 +89,7 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
         isConnected = false
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @SuppressLint("SetTextI18n")
     override fun onClick(v: View) {
         when (v.id) {
@@ -93,7 +101,7 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
                 // Check if the network is connected and is of type WI-FI
                 val capabilities = connectivityManager.getNetworkCapabilities(network)
                 if (capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    mPairServer?.start(this@WLanActivity)
+                    discoveryService?.start(this@WLanActivity)
                     runOnUiThread {
                         Toast.makeText(this, "Start Server", Toast.LENGTH_LONG).show()
                     }
@@ -110,15 +118,17 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
             }
 
             R.id.tv_btn_connect -> {
+                // Get the connectivity manager
                 val connectivityManager =
                     getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                 val network = connectivityManager.activeNetwork
+                // Check if the network is connected and is of type WI-FI
                 val capabilities = connectivityManager.getNetworkCapabilities(network)
                 if (capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    mPairedList = mPairServer!!.pairedDeviceList
+                    val mPairedList = discoveryService!!.pairedDeviceList
                     for (device in mPairedList) {
-                        Log.e("terminal_sn", device.terminal_sn)
-                        Log.e("ws_address", device.ws_address)
+                        Log.e(TAG, "terminal_sn " + device.terminal_sn)
+                        Log.e(TAG, "ws_address " +  device.ws_address)
                     }
                     if (mPairedList.isEmpty()) {
                         runOnUiThread {
@@ -134,7 +144,7 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
                     }
                     // Perform the connection operation
                     val ip = "ws://" + mPairedList[0].ip_address + ":" + mPairedList[0].port
-                    ECRHubClient.getInstance().connect(ip)
+                    mClient.connectWifi(ip)
                     runOnUiThread {
                         tv_text_1.text = "connect $ip"
                     }
@@ -153,65 +163,45 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
 
             R.id.tv_btn_disconnect -> {
                 if (!isConnected) {
-                    runOnUiThread {
-                        Toast.makeText(this, "Server is not connect", Toast.LENGTH_LONG).show()
-                    }
+                    Toast.makeText(this, "Server is not connect", Toast.LENGTH_LONG).show()
                     return
                 }
                 mClient.disConnect()
-                runOnUiThread {
-                    tv_text_1.text = ""
+                isConnected = false
+
+                ll_layout1.visibility = View.GONE
+
+                val mPairedList = discoveryService!!.pairedDeviceList
+                if (mPairedList.isNotEmpty()) {
+                    val ip = "ws://" + mPairedList[0].ip_address + ":" + mPairedList[0].port
+                    tv_text_1.text = "paired $ip"
                 }
             }
 
             R.id.tv_btn_unpair -> {
-                mPairedList = mPairServer!!.pairedDeviceList
-                println("mPairedList: $mPairedList")
                 if (!isConnected) {
-                    runOnUiThread {
-                        Toast.makeText(this, "Server is not connect", Toast.LENGTH_LONG).show()
-                    }
-                } else {
-                    mPairServer?.unPair(mPairedList[0], object : ECRHubResponseCallBack {
-                        override fun onError(errorCode: String?, errorMsg: String?) {
-                            runOnUiThread {
-                                Toast.makeText(
-                                    this@WLanActivity,
-                                    "unPair failure:$errorMsg",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-
-                        override fun onSuccess(data: PaymentResponseParams?) {
-                            mClient.disConnect()
-                            runOnUiThread {
-                                ll_layout1.visibility = View.GONE
-                                Toast.makeText(
-                                    this@WLanActivity,
-                                    "Unpair Success!",
-                                    Toast.LENGTH_LONG
-                                )
-                                    .show()
-                            }
-                        }
-
-                    })
+                    Toast.makeText(this, "Server is not connect", Toast.LENGTH_LONG).show()
+                    return
                 }
-//                if (mPairedList.isNotEmpty()) {
+                val mPairedList = discoveryService!!.pairedDeviceList
+                Log.i(TAG, "mPairedList: $mPairedList")
+                if (mPairedList.isEmpty()) {
+                    Toast.makeText(this, "Paired list is empty", Toast.LENGTH_LONG).show()
+                    return
+                }
 
-//                } else {
-//                    runOnUiThread {
-//                        Toast.makeText(this, "Paired list is empty", Toast.LENGTH_LONG).show()
-//                    }
-//                }
+                discoveryService?.unPair(mPairedList[0])
+
+                ll_layout1.visibility = View.GONE
+                tv_text_1.text = ""
+
             }
 
             R.id.tv_btn_exit -> {
                 runOnUiThread {
                     tv_text_1.text = "The APP is exiting..."
                 }
-                mPairServer?.stop()
+                discoveryService?.stop()
                 mClient.disConnect()
                 finish()
             }
@@ -223,7 +213,6 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
                     }
                     return
                 }
-                PaymentActivity.mClient = mClient
                 startActivity(Intent(applicationContext, PaymentActivity::class.java))
             }
 
@@ -234,7 +223,6 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
                     }
                     return
                 }
-                RefundActivity.mClient = mClient
                 startActivity(Intent(applicationContext, RefundActivity::class.java))
             }
 
@@ -245,7 +233,6 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
                     }
                     return
                 }
-                AuthActivity.mClient = mClient
                 startActivity(Intent(applicationContext, AuthActivity::class.java))
             }
 
@@ -256,7 +243,6 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
                     }
                     return
                 }
-                AuthCompleteActivity.mClient = mClient
                 startActivity(Intent(applicationContext, AuthCompleteActivity::class.java))
             }
 
@@ -267,7 +253,6 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
                     }
                     return
                 }
-                CashBackActivity.mClient = mClient
                 startActivity(Intent(applicationContext, CashBackActivity::class.java))
             }
 
@@ -278,24 +263,13 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
                     }
                     return
                 }
-                QueryActivity.mClient = mClient
                 startActivity(Intent(applicationContext, QueryActivity::class.java))
             }
 
-            R.id.tv_btn_close -> {
-                if (!isConnected) {
-                    runOnUiThread {
-                        Toast.makeText(this, "Server is not connect", Toast.LENGTH_LONG).show()
-                    }
-                    return
-                }
-                CloseActivity.mClient = mClient
-                startActivity(Intent(applicationContext, CloseActivity::class.java))
-            }
         }
     }
 
-    override fun onDevicePair(data: ECRHubMessageData?, ip: String?) {
+    override fun onDevicePair(data: EcrMessageData?, ip: String) {
         runOnUiThread {
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Pair Device")
@@ -304,60 +278,24 @@ class WLanActivity : Activity(), ECRHubConnectListener, OnClickListener, ECRHubP
             builder.setPositiveButton(
                 "Pair"
             ) { p0, _ ->
-                mPairServer?.confirmPair(data)
-                ECRHubClient.getInstance().connect(ip)
+                discoveryService?.confirmPair(data)
+                mClient.connectWifi(ip)
                 p0?.dismiss()
             }
             builder.setNegativeButton("Cancel") { p0, _ ->
-                mPairServer?.cancelPair(data)
+                discoveryService?.cancelPair(data)
                 p0?.dismiss()
             }
             builder.show()
         }
     }
 
-    override fun onDeviceUnpair(data: ECRHubMessageData?) {
-        mPairedList = mPairServer!!.pairedDeviceList
-        runOnUiThread {
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("Unpair Device")
-            builder.setMessage("Register unpair the " + data?.device_data?.device_name + " device")
-            builder.setCancelable(false)
-            println("mPairedList: $mPairedList")
-            builder.setPositiveButton(
-                "confirm"
-            ) { p0, _ ->
-                if (mPairedList.isNotEmpty()) {
-                    mPairServer?.unPair(mPairedList[0], object : ECRHubResponseCallBack {
-                        override fun onError(errorCode: String?, errorMsg: String?) {
-                            runOnUiThread {
-                                Toast.makeText(
-                                    this@WLanActivity,
-                                    "unPair failure:$errorMsg",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-
-                        override fun onSuccess(data: PaymentResponseParams?) {
-                            mClient.disConnect()
-                            runOnUiThread {
-                                ll_layout1.visibility = View.GONE
-                                Toast.makeText(
-                                    this@WLanActivity,
-                                    "Unpair Success!",
-                                    Toast.LENGTH_LONG
-                                )
-                                    .show()
-                            }
-                        }
-                    })
-                    p0?.dismiss()
-                } else {
-                    return@setPositiveButton
-                }
+    override fun onDeviceUnpair(data: EcrMessageData?) {
+        val mPairedList = discoveryService!!.pairedDeviceList
+        if (mPairedList.isEmpty()) {
+            runOnUiThread{
+                tv_text_1.text = ""
             }
-            builder.show()
         }
     }
 }

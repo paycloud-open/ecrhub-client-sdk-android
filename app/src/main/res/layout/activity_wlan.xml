@@ -75,7 +75,7 @@
             android:background="#FFFFFF"
             android:gravity="center"
             android:padding="10dp"
-            android:text="Refund/Void" />
+            android:text="Refund" />
 
         <TextView
             android:id="@+id/tv_btn_auth"
@@ -121,17 +121,6 @@
             android:padding="10dp"
             android:text="Query" />
 
-        <TextView
-            android:id="@+id/tv_btn_close"
-            android:layout_width="390dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:background="#FFFFFF"
-            android:gravity="center"
-            android:padding="10dp"
-            android:visibility="gone"
-            android:text="Close" />
     </LinearLayout>
 
     <TextView
@@ -145,17 +134,12 @@
         android:padding="10dp"
         android:text="Exit App" />
 
-    <androidx.core.widget.NestedScrollView
+    <TextView
+        android:id="@+id/tv_text_1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/tv_text_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:padding="10dp"
-            android:text="" />
-    </androidx.core.widget.NestedScrollView>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:text="" />
 </LinearLayout>

@@ -1,21 +1,22 @@
 package com.wiseasy.ecr.sdk.listener;
-import com.wiseasy.ecr.sdk.util.ECRHubMessageData;
+
+import com.wiseasy.ecr.sdk.bean.EcrMessageData;
 
 /**
  * Device Pairing Listening
  */
-public interface ECRHubPairListener {
+public interface EcrPairListener {
     /**
      * The ip address of the device
      *
      * @param ip
      * @return
      */
-    void onDevicePair(ECRHubMessageData data, String ip);
+    void onDevicePair(EcrMessageData data, String ip);
 
 
     /**
      * unpair
      */
-    void onDeviceUnpair(ECRHubMessageData data);
+    void onDeviceUnpair(EcrMessageData data);
 }

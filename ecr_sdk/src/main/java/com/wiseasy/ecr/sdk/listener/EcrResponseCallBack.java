@@ -1,6 +1,5 @@
 package com.wiseasy.ecr.sdk.listener;
 
-import com.wiseasy.ecr.sdk.client.payment.PaymentResponseParams;
 
 /**
  * api return callback
@@ -10,7 +9,7 @@ import com.wiseasy.ecr.sdk.client.payment.PaymentResponseParams;
  *
  * @author pupan
  */
-public interface ECRHubResponseCallBack {
+public interface EcrResponseCallBack {
 
     /**
      * Failed callback (1. The error callback and interface request caused by network exception are successful,
@@ -27,5 +26,5 @@ public interface ECRHubResponseCallBack {
      *
      * @param data response
      */
-    void onSuccess(PaymentResponseParams data);
+    void onSuccess(String data);
 }

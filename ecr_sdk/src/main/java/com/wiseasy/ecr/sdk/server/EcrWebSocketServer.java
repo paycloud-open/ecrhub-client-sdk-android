@@ -1,4 +1,6 @@
-package com.wiseasy.ecr.sdk.device;
+package com.wiseasy.ecr.sdk.server;
+
+import android.util.Log;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -7,31 +9,32 @@ import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
-public class ECRHubWebSocketServer extends WebSocketServer {
+public class EcrWebSocketServer extends WebSocketServer {
+
+    private static final String TAG = "EcrWebSocketServer";
     private final OnServerCallback onServerCallback;
 
-    public ECRHubWebSocketServer(InetSocketAddress address, OnServerCallback callback) {
+    public EcrWebSocketServer(InetSocketAddress address, OnServerCallback callback) {
         super(address);
         onServerCallback = callback;
     }
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        System.out.println(
-                conn.getRemoteSocketAddress().getAddress().getHostAddress() + " entered the room!");
-        System.out.println("New connection opened");
+        Log.i(TAG, conn.getRemoteSocketAddress().getAddress().getHostAddress() + " entered the room!");
+        Log.i(TAG, "New connection opened");
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        System.out.println("Connection closed");
+        Log.i(TAG, "Connection closed");
         onServerCallback.onClose();
         conn.close();
     }
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        System.out.println("Received message: " + message);
+        Log.i(TAG, "Received message: " + message);
         onServerCallback.onMessageReceived(conn, message);
     }
 
@@ -45,13 +48,13 @@ public class ECRHubWebSocketServer extends WebSocketServer {
         if (null != conn) {
             conn.close();
         }
-        System.err.println("Error occurred: " + ex.getMessage());
+        Log.i(TAG, "Error occurred: " + ex.getMessage());
         onServerCallback.onError(ex.getMessage());
     }
 
     @Override
     public void onStart() {
         onServerCallback.onServerStart();
-        System.out.println("WebSocket server started");
+        Log.i(TAG, "WebSocket server started");
     }
 }

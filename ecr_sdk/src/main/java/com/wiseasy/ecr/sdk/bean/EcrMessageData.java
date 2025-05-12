@@ -1,39 +1,16 @@
-package com.wiseasy.ecr.sdk.util;
+package com.wiseasy.ecr.sdk.bean;
 
-import org.json.JSONObject;
 
-public class ECRHubMessageData {
+public class EcrMessageData {
     //消息主题
     public final static String ECR_HUB_TOPIC_PAIR = "ecrhub.pair";
-    public final static String ECR_HUB_TOPIC_INIT = "ecrhub.pay.init";
     public final static String ECR_HUB_TOPIC_UNPAIR = "ecrhub.unpair";
-    public final static String ECR_HUB_TOPIC_TRANS_PAY = "cashier.hub.trans.pay";
-    public final static String ECR_HUB_TOPIC_TRANS_REFUND = "cashier.hub.trans.refund";
-    public final static String ECR_HUB_TOPIC_TRANS_QUERY = "cashier.hub.trans.query";
-    public final static String ECR_HUB_TOPIC_TRANS_CLOSE_ORDER = "cashier.hub.trans.close";
-    public final static String ECR_HUB_TOPIC_CLOUD_PAY = "cloud.hub.pay.order";
+
 
     public final static String ECR_HUB_TOPIC_WLAN_PAY = "ecrhub.pay.order";
-
     public final static String ECR_HUB_TOPIC_WLAN_QUERY = "ecrhub.pay.query";
-
-    public final static String ECR_HUB_TOPIC_WLAN_INIT = "ecrhub.init";
-
-    public final static String ECR_HUB_TOPIC_WLAN_HEART_BEAT = "ecrhub.heartbeat";
     public final static String ECR_HUB_TOPIC_WLAN_CLOSE = "ecrhub.pay.close";
-    public final static String ECR_HUB_TOPIC_CLOUD_TRANS_ORDER = "cloud.hub.trans.order";
 
-    public final static String ECR_HUB_TOPIC_TRANS_SUBMIT = "cashier.hub.trans.submit";
-    public final static String ECR_HUB_TOPIC_CLOUD_REFUND = "cloud.hub.refund.order";
-    public final static String ECR_HUB_TOPIC_CLOUD_CLOSE_ORDER = "cloud.hub.close.order";
-
-    public final static String ECR_HUB_TOPIC_CLOUD_NOTIFY = "cloud.hub.trans.notify";
-
-    public final static String ECR_HUB_TOPIC_TOPIC_NOTIFY = "cashier.hub.trans.notify";
-
-    public final static String ORDER_QUEUE_MODE_FIFO = "FIFO";
-
-    public final static String ORDER_QUEUE_MODE_FILO = "FILO";
 
     /**
      * 银行卡支付方式
@@ -49,27 +26,16 @@ public class ECRHubMessageData {
     public final static String ECR_HUB_QR_B_SCAN_C = "QR_B_SCAN_C";
 
 
-    public boolean isCloseOrder() {
-        return topic.equals(ECR_HUB_TOPIC_CLOUD_CLOSE_ORDER) || topic.equals(ECR_HUB_TOPIC_TRANS_CLOSE_ORDER) || topic.equals(ECR_HUB_TOPIC_WLAN_CLOSE);
-    }
-
-    public boolean isNotificationOrder() {
-        return topic.equals(ECR_HUB_TOPIC_CLOUD_NOTIFY) || topic.equals(ECR_HUB_TOPIC_TOPIC_NOTIFY);
-    }
 
     /**
      * 消息主题
      */
-    private String topic = "";
+    private String topic;
     /**
      * 应用id
      */
     private String app_id;
 
-    /**
-     * 消息id
-     */
-    private String request_id;
     /**
      * 时间戳
      */
@@ -81,11 +47,6 @@ public class ECRHubMessageData {
 
     private String response_msg;
 
-    private NotifyData notify_data;
-
-    private VoiceData voice_data;
-
-    private PrintData print_data;
     private BizData biz_data;
 
     private DeviceData device_data;
@@ -128,20 +89,6 @@ public class ECRHubMessageData {
         return device_data;
     }
 
-    public NotifyData getNotify_data() {
-        return notify_data;
-    }
-
-    public PrintData getPrint_data() {
-        return print_data;
-    }
-
-    public VoiceData getVoice_data() {
-        if (null == voice_data) {
-            voice_data = new VoiceData();
-        }
-        return voice_data;
-    }
 
     public void setCall_app_mode(String call_app_mode) {
         this.call_app_mode = call_app_mode;
@@ -165,10 +112,6 @@ public class ECRHubMessageData {
         this.app_id = app_id;
     }
 
-    public void setRequest_id(String request_id) {
-        this.request_id = request_id;
-    }
-
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
@@ -181,9 +124,6 @@ public class ECRHubMessageData {
         return app_id;
     }
 
-    public String getRequest_id() {
-        return request_id;
-    }
 
     public String getTimestamp() {
         return timestamp;
@@ -193,17 +133,6 @@ public class ECRHubMessageData {
         return topic;
     }
 
-    public void setNotify_data(NotifyData notify_data) {
-        this.notify_data = notify_data;
-    }
-
-    public void setPrint_data(PrintData print_data) {
-        this.print_data = print_data;
-    }
-
-    public void setVoice_data(VoiceData voice_data) {
-        this.voice_data = voice_data;
-    }
 
     public class DeviceData {
         /**
@@ -274,12 +203,6 @@ public class ECRHubMessageData {
          */
         private boolean confirm_on_terminal;
 
-        private boolean on_screen_tip;
-        /**
-         * 多订单处理模式
-         */
-        private String order_queue_mode;
-
         /**
          * 时间有效期
          */
@@ -330,42 +253,15 @@ public class ECRHubMessageData {
          */
         private String trans_status;
 
-        /**
-         * 错误信息
-         */
-        private String msg;
-
-        private String push_no;
-
         private String order_amount;
 
         private String cashback_amount;
 
         private String tip_amount;
 
-        private String price_currency;
-
         private String trans_type;
 
-        private boolean limit_length;
 
-        private boolean is_auto_settlement;
-
-        private Integer print_receipt;
-
-        private String card_type;
-
-        public void setCard_type(String card_type) {
-            this.card_type = card_type;
-        }
-
-        public String getCard_type() {
-            return card_type;
-        }
-
-        public boolean isIs_auto_settlement() {
-            return is_auto_settlement;
-        }
 
         public boolean isConfirm_on_terminal() {
             return confirm_on_terminal;
@@ -379,9 +275,6 @@ public class ECRHubMessageData {
             this.pay_scenario = pay_scenario;
         }
 
-        public void setIs_auto_settlement(boolean is_auto_settlement) {
-            this.is_auto_settlement = is_auto_settlement;
-        }
 
         String token;
 
@@ -401,49 +294,8 @@ public class ECRHubMessageData {
             return token;
         }
 
-        public void setLimit_length(boolean limit_length) {
-            this.limit_length = limit_length;
-        }
-
-        public boolean getLimit_length() {
-            return limit_length;
-        }
-
-        public void setPush_no(String push_no) {
-            this.push_no = push_no;
-        }
-
-        public String getPush_no() {
-            return push_no;
-        }
-
-        public NotifyData getNotify_data() {
-            if (null == notify_data) {
-                notify_data = new NotifyData();
-            }
-            return notify_data;
-        }
-
-        public PrintData getPrint_data() {
-            if (null == print_data) {
-                print_data = new PrintData();
-            }
-            return print_data;
-        }
-
-        public VoiceData getVoice_data() {
-            if (null == voice_data) {
-                voice_data = new VoiceData();
-            }
-            return voice_data;
-        }
-
         public String getOrder_amount() {
             return order_amount;
-        }
-
-        public String getPrice_currency() {
-            return price_currency;
         }
 
         public String getTip_amount() {
@@ -456,10 +308,6 @@ public class ECRHubMessageData {
 
         public void setOrder_amount(String order_amount) {
             this.order_amount = order_amount;
-        }
-
-        public void setPrice_currency(String price_currency) {
-            this.price_currency = price_currency;
         }
 
         public void setTip_amount(String tip_amount) {
@@ -476,10 +324,6 @@ public class ECRHubMessageData {
 
         public int getExpires() {
             return expires;
-        }
-
-        public String getOrder_queue_mode() {
-            return order_queue_mode;
         }
 
         public void setTrans_status(String trans_status) {
@@ -559,13 +403,6 @@ public class ECRHubMessageData {
             return trans_no;
         }
 
-        public void setMsg(String msg) {
-            this.msg = msg;
-        }
-
-        public String getMsg() {
-            return msg;
-        }
 
         /**
          * 获取Cashier识别应用间调用的支付方式
@@ -590,168 +427,11 @@ public class ECRHubMessageData {
             return confirm_on_terminal;
         }
 
-        public Integer getPrint_receipt() {
-            return print_receipt;
-        }
-
-        public void setPrint_receipt(Integer print_receipt) {
-            this.print_receipt = print_receipt;
-        }
 
         public void setExpires(int expires) {
             this.expires = expires;
         }
 
-        public void setOrder_queue_mode(String order_queue_mode) {
-            this.order_queue_mode = order_queue_mode;
-        }
-
-        public boolean isOn_screen_tip() {
-            return on_screen_tip;
-        }
-
-        public void setOn_screen_tip(boolean on_screen_tip) {
-            this.on_screen_tip = on_screen_tip;
-        }
-
-
-    }
-
-    public class NotifyData {
-        /**
-         * 是否需要弹出通知栏消息
-         */
-        private boolean app_pop;
-        /**
-         * 通知栏标题
-         */
-        private String title;
-        /**
-         * 通知栏内容
-         */
-        private String body;
-        /**
-         * 通知栏图片地址
-         */
-        private String image_url;
-        /**
-         * 声音
-         */
-        private String sound;
-        /**
-         * 通知栏跳转到指定页面
-         */
-        private JSONObject intent;
-
-        public void setApp_pop(boolean app_pop) {
-            this.app_pop = app_pop;
-        }
-
-        public void setBody(String body) {
-            this.body = body;
-        }
-
-        public void setImage_url(String image_url) {
-            this.image_url = image_url;
-        }
-
-        public void setIntent(JSONObject intent) {
-            this.intent = intent;
-        }
-
-        public void setSound(String sound) {
-            this.sound = sound;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public JSONObject getIntent() {
-            return intent;
-        }
-
-        public String getBody() {
-            return body;
-        }
-
-        public String getImage_url() {
-            return image_url;
-        }
-
-        public String getSound() {
-            return sound;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-    }
-
-    public class VoiceData {
-        /**
-         * 语音播报内容
-         */
-        private String content;
-        /**
-         * 语音播报语种
-         */
-        private String content_locale;
-        /**
-         * 语音文件地址
-         */
-        private String content_url;
-
-        public void setContent(String content) {
-            this.content = content;
-        }
-
-        public void setContent_locale(String content_locale) {
-            this.content_locale = content_locale;
-        }
-
-        public void setContent_url(String content_url) {
-            this.content_url = content_url;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public String getContent_locale() {
-            return content_locale;
-        }
-
-        public String getContent_url() {
-            return content_url;
-        }
-    }
-
-    public class PrintData {
-        /**
-         * 打印文本内容
-         */
-        String content;
-        /**
-         * 打印内容文本地址
-         */
-        String content_url;
-
-        public void setContent_url(String content_url) {
-            this.content_url = content_url;
-        }
-
-        public void setContent(String content) {
-            this.content = content;
-        }
-
-        public String getContent_url() {
-            return content_url;
-        }
-
-        public String getContent() {
-            return content;
-        }
     }
 
 }

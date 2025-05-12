@@ -6,7 +6,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
-import android.util.Log;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -65,6 +64,33 @@ public class NetUtils {
         }
         return null;
     }
+
+
+    public static String getWifiIPAddress(Context context) {
+        // 获取 WifiManager 实例
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+
+        // 检查 Wi-Fi 是否开启
+        if (wifiManager.isWifiEnabled()) {
+            // 获取当前连接的 Wi-Fi 信息
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+
+            // 检查是否有有效的 IP 地址
+            if (wifiInfo != null && wifiInfo.getIpAddress() != 0) {
+                // 将 IP 地址转换为字符串格式
+                int ipAddress = wifiInfo.getIpAddress();
+                return String.format("%d.%d.%d.%d",
+                        (ipAddress & 0xFF),
+                        (ipAddress >> 8 & 0xFF),
+                        (ipAddress >> 16 & 0xFF),
+                        (ipAddress >> 24 & 0xFF));
+            }
+        }
+
+        // 如果没有 Wi-Fi 或未连接网络，返回默认值（或 null）
+        return "0.0.0.0";  // 或者返回默认 IP 地址，如 "0.0.0.0"
+    }
+
 
     /**
      * 检测当的网络（WLAN、3G/2G）状态

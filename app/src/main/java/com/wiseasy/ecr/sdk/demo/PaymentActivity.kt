@@ -4,50 +4,22 @@ import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
 import com.alibaba.fastjson.JSON
-import com.wiseasy.ecr.sdk.client.ECRHubClient
-import com.wiseasy.ecr.sdk.client.payment.PaymentRequestParams
-import com.wiseasy.ecr.sdk.client.payment.PaymentResponseParams
-import com.wiseasy.ecr.sdk.listener.ECRHubResponseCallBack
-import kotlinx.android.synthetic.main.activity_payment.edit_input_amount
+import com.wiseasy.ecr.sdk.EcrClient
+import com.wiseasy.ecr.sdk.listener.EcrResponseCallBack
+import com.wiseasy.ecr.sdk.util.Constants
 import kotlinx.android.synthetic.main.activity_payment.*
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
 
 class PaymentActivity : Activity() {
-    companion object {
-        lateinit var mClient: ECRHubClient
-    }
+
+    private val mClient = EcrClient.getInstance()
     private var merchantOrderNo: String? = null
-    fun getCurDateStr(format: String?): String? {
-        val c = Calendar.getInstance()
-        return date2Str(c, format)
-    }
-
-    fun date2Str(c: Calendar?, format: String?): String? {
-        return if (c == null) null else date2Str(
-            c.time,
-            format
-        )
-    }
-
-    fun date2Str(d: Date?, format: String?): String? {
-        var format = format
-        return if (d == null) {
-            null
-        } else {
-            if (format.isNullOrEmpty()) {
-                format = "yyyy-MM-dd HH:mm:ss"
-            }
-            val sdf = SimpleDateFormat(format)
-            sdf.format(d)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_payment)
+
         val sharedPreferences = getSharedPreferences(packageName, MODE_PRIVATE)
+
         tv_btn_2.setOnClickListener {
             finish()
         }
@@ -57,74 +29,60 @@ class PaymentActivity : Activity() {
                 Toast.makeText(this, "Please input amount", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
+
             val params = PaymentRequestParams()
             params.app_id = "wz6012822ca2f1as78"
-            merchantOrderNo = "123" + getCurDateStr("yyyyMMddHHmmss")
-            params.merchant_order_no = merchantOrderNo
-            params.order_amount = amount
-            params.on_screen_tip = false
-            params.print_receipt = 0
-            params.pay_scenario = "SWIPE_CARD"
-            val voiceData = params.voice_data
-            voiceData.content = "CodePay Register Received a new order"
-            voiceData.content_locale = "en-US"
-            params.voice_data = voiceData
+            params.topic = Constants.PAYMENT_TOPIC
+            params.timestamp = System.currentTimeMillis().toString()
+
+            params.biz_data = PaymentRequestParams.BizData()
+            params.biz_data.trans_type = Constants.TRANS_TYPE_SALE
+            params.biz_data.order_amount = amount
+            merchantOrderNo = System.currentTimeMillis().toString()
+            params.biz_data.merchant_order_no = merchantOrderNo
+            params.biz_data.pay_scenario = "SWIPE_CARD"
+            params.biz_data.isConfirm_on_terminal = confirm_on_terminal.isChecked
+
+            val json = JSON.toJSONString(params)
             runOnUiThread {
-                tv_btn_3.text =
-                    "Send Sale data --> ${params.toJSON()}"
+                tv_btn_3.text = "Send Sale data -->\n$json"
             }
-            mClient.payment.sale(params, object :
-                ECRHubResponseCallBack {
+
+            mClient.doTransaction(json, object :
+                EcrResponseCallBack {
                 override fun onError(errorCode: String?, errorMsg: String?) {
                     runOnUiThread {
-                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "Failure:" + errorMsg
+                        tv_btn_3.text = tv_btn_3.text.toString() + "\nFailure -->\n" + errorMsg
                     }
                 }
 
-                override fun onSuccess(data: PaymentResponseParams?) {
+                override fun onSuccess(data: String) {
                     val editor = sharedPreferences.edit()
-                    editor.putString("merchant_order_no", params.merchant_order_no)
+                    editor.putString("merchant_order_no", merchantOrderNo)
                     editor.apply()
                     runOnUiThread {
-                        tv_btn_3.text =
-                            tv_btn_3.text.toString() + "\n" + "Result:" + JSON.toJSON(data).toString()
+                        tv_btn_3.text = tv_btn_3.text.toString() + "\nReceive sale Result -->\n" + data
                     }
                 }
             })
         }
-        tv_btn_close.setOnClickListener {
-            val merchantOrderNo = sharedPreferences.getString("merchant_order_no", "").toString()
-            val params =
-                PaymentRequestParams()
-            if (merchantOrderNo.isEmpty()) {
+        tv_btn_cancel.setOnClickListener {
+            if (merchantOrderNo.isNullOrEmpty()) {
                 Toast.makeText(this, "Transaction does not exist", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
-            } else {
-                params.merchant_order_no = merchantOrderNo
             }
-            params.app_id = "wz6012822ca2f1as78"
-            runOnUiThread {
-                tv_btn_3.text =
-                    "Send Close data --> " + params.toJSON().toString()
-            }
-            mClient.payment.close(params, object :
-                ECRHubResponseCallBack {
-                override fun onError(errorCode: String?, errorMsg: String?) {
-                    runOnUiThread {
-                        tv_btn_3.text = tv_btn_3.text.toString() + "\n" + "Failure:" + errorMsg
-                    }
-                }
 
-                override fun onSuccess(data: PaymentResponseParams?) {
-                    val editor = sharedPreferences.edit()
-                    editor.remove("merchant_order_no")
-                    editor.apply()
-                    runOnUiThread {
-                        tv_btn_3.text =
-                            tv_btn_3.text.toString() + "\n" + "result:" + JSON.toJSON(data)
-                    }
-                }
-            })
+            val params = PaymentRequestParams()
+            params.app_id = "wz6012822ca2f1as78"
+            params.topic = Constants.CLOSE_TOPIC
+            params.biz_data = PaymentRequestParams.BizData()
+            params.biz_data.merchant_order_no = merchantOrderNo
+
+            val json = JSON.toJSONString(params)
+            runOnUiThread {
+                tv_btn_3.text = tv_btn_3.text.toString() + "\nSend Close data -->\n $json"
+            }
+            mClient.cancelTransaction(json)
         }
     }
 }

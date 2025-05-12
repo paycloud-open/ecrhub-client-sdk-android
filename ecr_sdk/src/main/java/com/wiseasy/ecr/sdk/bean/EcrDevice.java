@@ -1,10 +1,6 @@
-package com.wiseasy.ecr.sdk.device;
+package com.wiseasy.ecr.sdk.bean;
 
-/**
- * Device
- * @author pupan
- */
-public class ECRHubDevice {
+public class EcrDevice {
     //server address
     String ws_address;
     //ip address

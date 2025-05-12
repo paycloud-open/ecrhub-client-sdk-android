@@ -1,2 +1,2 @@
-include ':app', ':wiseasy_ecr_sdk'
+include ':app', ':ecr_sdk'
 rootProject.name='wiseasy_ecr_sdk_demo'

@@ -16,7 +16,7 @@ public class Constants {
     /**
      * init topic
      */
-    public static final String INIT_TOPIC = "ecrhub.init";
+    public static final String GETINFO_TOPIC = "ecrhub.getInfo";
 
     /**
      * payment topic
@@ -32,11 +32,6 @@ public class Constants {
      * close topic
      */
     public static final String CLOSE_TOPIC = "ecrhub.pay.close";
-
-    /**
-     * heart beat topic
-     */
-    public static final String HEART_BEAT_TOPIC = "ecrhub.heartbeat";
 
     /**
      * trans type purchase
@@ -82,18 +77,7 @@ public class Constants {
      * trans type cashback
      */
     public static final String TRANS_TYPE_CASH_BACK = "11";
-    /**
-     * BankCard Payment
-     */
-    public final static String BANKCARD_PAY_TYPE = "BANKCARD";
-    /**
-     * qr C scan B
-     */
-    public final static String QR_C_SCAN_B_PAY_TYPE = "QR_C_SCAN_B";
-    /**
-     * qr B scan C
-     */
-    public final static String QR_B_SCAN_C = "QR_B_SCAN_C";
+
     /**
      * ecr hub pair list key
      */

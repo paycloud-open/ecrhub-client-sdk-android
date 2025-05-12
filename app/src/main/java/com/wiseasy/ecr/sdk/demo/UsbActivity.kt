@@ -6,45 +6,29 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.alibaba.fastjson.JSON
-import com.wiseasy.ecr.sdk.client.ECRHubClient
-import com.wiseasy.ecr.sdk.client.ECRHubConfig
-import com.wiseasy.ecr.sdk.client.payment.PaymentResponseParams
-import com.wiseasy.ecr.sdk.listener.ECRHubConnectListener
-import com.wiseasy.ecr.sdk.listener.ECRHubResponseCallBack
-import com.wiseasy.ecr.sdk.util.Constants
+import com.wiseasy.ecr.sdk.EcrClient
+import com.wiseasy.ecr.sdk.listener.EcrConnectListener
+import com.wiseasy.ecr.sdk.listener.EcrResponseCallBack
 import kotlinx.android.synthetic.main.activity_usb.tv_btn_open
 import kotlinx.android.synthetic.main.activity_usb.ll_layout1
-import kotlinx.android.synthetic.main.activity_usb.tv_btn_auth
-import kotlinx.android.synthetic.main.activity_usb.tv_btn_cashback
-import kotlinx.android.synthetic.main.activity_usb.tv_btn_close
 import kotlinx.android.synthetic.main.activity_usb.tv_btn_close_order
-import kotlinx.android.synthetic.main.activity_usb.tv_btn_complete
 import kotlinx.android.synthetic.main.activity_usb.tv_btn_init
 import kotlinx.android.synthetic.main.activity_usb.tv_btn_query
 import kotlinx.android.synthetic.main.activity_usb.tv_btn_refund
 import kotlinx.android.synthetic.main.activity_usb.tv_btn_sale
 
-class UsbActivity : Activity(), ECRHubConnectListener, View.OnClickListener {
-    companion object {
-        lateinit var mClient: ECRHubClient
-    }
+class UsbActivity : Activity(), EcrConnectListener, View.OnClickListener {
 
+    private val mClient = EcrClient.getInstance()
     private var isConnected: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_usb)
-        val config = ECRHubConfig()
-        mClient = ECRHubClient.getInstance()
-        mClient.init(config, this, this, Constants.ECRHubType.USB)
+        mClient.init(this, this)
         tv_btn_open.setOnClickListener(this)
-        tv_btn_close.setOnClickListener(this)
         tv_btn_sale.setOnClickListener(this)
         tv_btn_refund.setOnClickListener(this)
-        tv_btn_auth.setOnClickListener(this)
-        tv_btn_complete.setOnClickListener(this)
-        tv_btn_cashback.setOnClickListener(this)
         tv_btn_query.setOnClickListener(this)
         tv_btn_close_order.setOnClickListener(this)
         tv_btn_init.setOnClickListener(this)
@@ -55,7 +39,6 @@ class UsbActivity : Activity(), ECRHubConnectListener, View.OnClickListener {
         runOnUiThread {
             ll_layout1.visibility = View.VISIBLE
             tv_btn_open.visibility = View.GONE
-            tv_btn_close.visibility = View.VISIBLE
             Toast.makeText(this, "Connect Success!", Toast.LENGTH_LONG).show()
         }
         isConnected = true
@@ -65,7 +48,6 @@ class UsbActivity : Activity(), ECRHubConnectListener, View.OnClickListener {
         runOnUiThread {
             ll_layout1.visibility = View.GONE
             tv_btn_open.visibility = View.VISIBLE
-            tv_btn_close.visibility = View.GONE
             Toast.makeText(this, "Disconnect Success!", Toast.LENGTH_LONG).show()
         }
         isConnected = true
@@ -75,7 +57,6 @@ class UsbActivity : Activity(), ECRHubConnectListener, View.OnClickListener {
         runOnUiThread {
             ll_layout1.visibility = View.GONE
             tv_btn_open.visibility = View.VISIBLE
-            tv_btn_close.visibility = View.GONE
             Toast.makeText(this, "Connect Fail!", Toast.LENGTH_LONG).show()
         }
         isConnected = true
@@ -84,7 +65,8 @@ class UsbActivity : Activity(), ECRHubConnectListener, View.OnClickListener {
     override fun onClick(p0: View) {
         when (p0.id) {
             R.id.tv_btn_init -> {
-                mClient.payment.init(object : ECRHubResponseCallBack {
+                mClient.getTerminalInfo(object :
+                    EcrResponseCallBack {
                     override fun onError(errorCode: String?, errorMsg: String?) {
                         runOnUiThread {
                             Toast.makeText(applicationContext, "init error", Toast.LENGTH_LONG)
@@ -92,11 +74,11 @@ class UsbActivity : Activity(), ECRHubConnectListener, View.OnClickListener {
                         }
                     }
 
-                    override fun onSuccess(data: PaymentResponseParams?) {
+                    override fun onSuccess(data: String) {
                         runOnUiThread {
                             Toast.makeText(
                                 applicationContext,
-                                "init success:" + JSON.toJSON(data).toString(),
+                                "init success:$data",
                                 Toast.LENGTH_LONG
                             ).show()
                         }
@@ -106,11 +88,11 @@ class UsbActivity : Activity(), ECRHubConnectListener, View.OnClickListener {
             }
 
             R.id.tv_btn_open -> {
-                mClient.connect()
+                mClient.connectUsb()
             }
 
 
-            R.id.tv_btn_close -> {
+            R.id.tv_btn_cancel -> {
                 mClient.disConnect()
             }
 
@@ -121,7 +103,6 @@ class UsbActivity : Activity(), ECRHubConnectListener, View.OnClickListener {
                     }
                     return
                 }
-                PaymentActivity.mClient = mClient
                 startActivity(Intent(applicationContext, PaymentActivity::class.java))
             }
 
@@ -132,41 +113,7 @@ class UsbActivity : Activity(), ECRHubConnectListener, View.OnClickListener {
                     }
                     return
                 }
-                RefundActivity.mClient = mClient
                 startActivity(Intent(applicationContext, RefundActivity::class.java))
-            }
-
-            R.id.tv_btn_auth -> {
-                if (!isConnected) {
-                    runOnUiThread {
-                        Toast.makeText(this, "Server is not connect", Toast.LENGTH_LONG).show()
-                    }
-                    return
-                }
-                AuthActivity.mClient = mClient
-                startActivity(Intent(applicationContext, AuthActivity::class.java))
-            }
-
-            R.id.tv_btn_complete -> {
-                if (!isConnected) {
-                    runOnUiThread {
-                        Toast.makeText(this, "Server is not connect", Toast.LENGTH_LONG).show()
-                    }
-                    return
-                }
-                AuthCompleteActivity.mClient = mClient
-                startActivity(Intent(applicationContext, AuthCompleteActivity::class.java))
-            }
-
-            R.id.tv_btn_cashback -> {
-                if (!isConnected) {
-                    runOnUiThread {
-                        Toast.makeText(this, "Server is not connect", Toast.LENGTH_LONG).show()
-                    }
-                    return
-                }
-                CashBackActivity.mClient = mClient
-                startActivity(Intent(applicationContext, CashBackActivity::class.java))
             }
 
             R.id.tv_btn_query -> {
@@ -176,20 +123,9 @@ class UsbActivity : Activity(), ECRHubConnectListener, View.OnClickListener {
                     }
                     return
                 }
-                QueryActivity.mClient = mClient
                 startActivity(Intent(applicationContext, QueryActivity::class.java))
             }
 
-            R.id.tv_btn_close_order -> {
-                if (!isConnected) {
-                    runOnUiThread {
-                        Toast.makeText(this, "Server is not connect", Toast.LENGTH_LONG).show()
-                    }
-                    return
-                }
-                CloseActivity.mClient = mClient
-                startActivity(Intent(applicationContext, CloseActivity::class.java))
-            }
         }
     }
 }

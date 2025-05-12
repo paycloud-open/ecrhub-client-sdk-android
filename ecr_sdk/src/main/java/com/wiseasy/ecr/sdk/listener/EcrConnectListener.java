@@ -3,7 +3,7 @@ package com.wiseasy.ecr.sdk.listener;
 /**
  * connect status listener
  */
-public interface ECRHubConnectListener {
+public interface EcrConnectListener {
 
     /**
      * connect successfully

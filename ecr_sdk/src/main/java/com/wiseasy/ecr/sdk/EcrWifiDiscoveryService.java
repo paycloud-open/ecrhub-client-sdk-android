@@ -1,4 +1,6 @@
-package com.wiseasy.ecr.sdk.device;
+package com.wiseasy.ecr.sdk;
+
+import static com.wiseasy.ecr.sdk.util.Constants.ECR_HUB_TOPIC_UNPAIR;
 
 import android.content.Context;
 import android.os.Build;
@@ -7,11 +9,12 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.wiseasy.ecr.sdk.client.ECRHubClient;
-import com.wiseasy.ecr.sdk.listener.ECRHubPairListener;
-import com.wiseasy.ecr.sdk.listener.ECRHubResponseCallBack;
+import com.wiseasy.ecr.sdk.bean.EcrDevice;
+import com.wiseasy.ecr.sdk.bean.EcrMessageData;
+import com.wiseasy.ecr.sdk.listener.EcrPairListener;
+import com.wiseasy.ecr.sdk.server.EcrWebSocketServer;
+import com.wiseasy.ecr.sdk.server.OnServerCallback;
 import com.wiseasy.ecr.sdk.util.Constants;
-import com.wiseasy.ecr.sdk.util.ECRHubMessageData;
 import com.wiseasy.ecr.sdk.util.NetUtils;
 import com.wiseasy.ecr.sdk.util.SharePreferenceUtil;
 
@@ -20,65 +23,56 @@ import org.java_websocket.WebSocket;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 
-public class ECRHubWebSocketDiscoveryService implements OnServerCallback, ServiceListener {
+public class EcrWifiDiscoveryService implements OnServerCallback, ServiceListener {
 
-    private static final String TAG = "ECRHubWebSocketDiscoveryService";
+    private static final String TAG = "EcrWifiDiscoveryService";
     private final static String REMOTE_CLIENT_TYPE = "_ecr-hub-client._tcp.local.";
 
     public final static String REMOTE_SERVER_TYPE = "_ecr-hub-server._tcp.local.";
     private static int PORT = 35779;
     private final Context context;
     private String deviceName = "";
-    ECRHubWebSocketServer socketServer;
+    EcrWebSocketServer socketServer;
     private JmDNS mJmdns;
     private boolean isServerStart = false;
-    private ECRHubPairListener pairListener;
+    private EcrPairListener pairListener;
 
     private WebSocket connection;
 
-    public ECRHubWebSocketDiscoveryService(Context context) {
+    public EcrWifiDiscoveryService(Context context) {
         this.context = context;
         SharePreferenceUtil.init(context);
-        InetAddress ip = NetUtils.getLocalIPAddress();
         try {
+            String host = NetUtils.getWifiIPAddress(context);
+            InetAddress ip = InetAddress.getByName(host);
             mJmdns = JmDNS.create(ip, "ECRHubServerName");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void start(String name, ECRHubPairListener listener) {
+    public void start(String name, EcrPairListener listener) {
         deviceName = name;
         pairListener = listener;
         if (!isServerStart) {
             if (null == socketServer) {
                 InetSocketAddress address = new InetSocketAddress(PORT);
-                socketServer = new ECRHubWebSocketServer(address, this);
+                socketServer = new EcrWebSocketServer(address, this);
             }
             socketServer.start();
         }
     }
 
-    public void start(ECRHubPairListener listener) {
-        deviceName = Build.MODEL;
-        pairListener = listener;
-        if (!isServerStart) {
-            if (null == socketServer) {
-                InetSocketAddress address = new InetSocketAddress(PORT);
-                socketServer = new ECRHubWebSocketServer(address, this);
-            }
-            socketServer.start();
-        }
+    public void start(EcrPairListener listener) {
+        start(Build.MODEL, listener);
     }
 
     public void stop() {
@@ -96,12 +90,12 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
         }
     }
 
-    public void unPair(ECRHubDevice device, ECRHubResponseCallBack callBack) {
+    public void unPair(EcrDevice device) {
         String deviceList = SharePreferenceUtil.getString(Constants.ECR_HUB_PAIR_LIST_KEY, "");
         if (!deviceList.isEmpty()) {
             JSONArray array = JSON.parseArray(deviceList);
             for (int i = 0; i < array.size(); i++) {
-                ECRHubDevice deviceData = JSON.parseObject(array.getJSONObject(i).toString(), ECRHubDevice.class);
+                EcrDevice deviceData = JSON.parseObject(array.getJSONObject(i).toString(), EcrDevice.class);
                 if (deviceData.getName().equals(device.getName())) {
                     array.remove(i);
                     break;
@@ -109,21 +103,31 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
             }
             SharePreferenceUtil.put(Constants.ECR_HUB_PAIR_LIST_KEY, array.toString());
         }
-        if (ECRHubClient.getInstance().isConnected()) {
+        if (EcrClient.getInstance().isConnected()) {
             if (deviceName.isEmpty()) {
                 deviceName = Build.MODEL;
             }
             device.setName(deviceName);
             device.setWs_address(NetUtils.getMacAddress(context));
             device.setPort("" + PORT);
-            device.setIp_address(Objects.requireNonNull(NetUtils.getLocalIPAddress()).getHostAddress());
-            ECRHubClient.getInstance().requestUnPair(device, callBack);
+            device.setIp_address(NetUtils.getWifiIPAddress(context));
+
+            EcrMessageData data = new EcrMessageData();
+            data.getDevice_data().setDevice_name(device.getName());
+            data.getDevice_data().setMac_address(device.getWs_address());
+            data.getDevice_data().setPort(device.getPort());
+            data.getDevice_data().setIp_address(device.getIp_address());
+            data.getDevice_data().setAlias_name(device.getName());
+            data.setTopic(ECR_HUB_TOPIC_UNPAIR);
+
+            EcrClient.getInstance().sendData(JSON.toJSONString(data));
+            EcrClient.getInstance().disConnect();
         }
     }
 
-    public void deletePairList(ECRHubMessageData data) {
+    private void deletePairList(EcrMessageData data) {
         String deviceList = SharePreferenceUtil.getString(Constants.ECR_HUB_PAIR_LIST_KEY, "");
-        ECRHubDevice device = new ECRHubDevice();
+        EcrDevice device = new EcrDevice();
         device.setPort(data.getDevice_data().getPort());
         device.setIp_address(data.getDevice_data().getIp_address());
         if (null != data.getDevice_data().getAlias_name() && !"".equals(data.getDevice_data().getAlias_name())) {
@@ -136,7 +140,7 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
         if (!deviceList.isEmpty()) {
             JSONArray array = JSON.parseArray(deviceList);
             for (int i = 0; i < array.size(); i++) {
-                ECRHubDevice deviceData = JSON.parseObject(array.getJSONObject(i).toString(), ECRHubDevice.class);
+                EcrDevice deviceData = JSON.parseObject(array.getJSONObject(i).toString(), EcrDevice.class);
                 if (deviceData.getName().equals(device.getName())) {
                     array.remove(i);
                     break;
@@ -151,9 +155,9 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
             mJmdns.unregisterAllServices();
             final JSONObject clientInfo = new JSONObject();
             clientInfo.put("mac_address", NetUtils.getMacAddress(context));
-            clientInfo.put("ip_address", Objects.requireNonNull(NetUtils.getLocalIPAddress()).getHostAddress() + ":" + PORT);
+            clientInfo.put("ip_address", NetUtils.getWifiIPAddress(context) + ":" + PORT);
             clientInfo.put("name", deviceName);
-            System.out.println(clientInfo);
+            Log.i(TAG, "registerService: " + clientInfo.toJSONString());
             ServiceInfo mServiceInfo = ServiceInfo.create(REMOTE_CLIENT_TYPE, deviceName + "_" + System.currentTimeMillis(), PORT, 0, 0, clientInfo.toJSONString());
             mJmdns.registerService(mServiceInfo);
         }
@@ -168,13 +172,14 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
                 mJmdns.unregisterAllServices();
                 mJmdns = null;
             }
-            InetAddress ip = NetUtils.getLocalIPAddress();
+            String host = NetUtils.getWifiIPAddress(context);
+            InetAddress ip = InetAddress.getByName(host);
             mJmdns = JmDNS.create(ip, "ECRHubServerName");
             final JSONObject clientInfo = new JSONObject();
             clientInfo.put("mac_address", NetUtils.getMacAddress(context));
-            clientInfo.put("ip_address", Objects.requireNonNull(NetUtils.getLocalIPAddress()).getHostAddress() + ":" + PORT);
+            clientInfo.put("ip_address", host + ":" + PORT);
             clientInfo.put("name", deviceName);
-            System.out.println(clientInfo);
+            Log.i(TAG, clientInfo.toJSONString());
             ServiceInfo mServiceInfo = ServiceInfo.create(REMOTE_CLIENT_TYPE, deviceName + "_" + System.currentTimeMillis(), PORT, 0, 0, clientInfo.toJSONString());
             mJmdns.registerService(mServiceInfo);
             mJmdns.addServiceListener(REMOTE_SERVER_TYPE, this);
@@ -188,7 +193,7 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
         isServerStart = false;
         PORT += 1;
         InetSocketAddress address = new InetSocketAddress(PORT);
-        socketServer = new ECRHubWebSocketServer(address, this);
+        socketServer = new EcrWebSocketServer(address, this);
         socketServer.start();
     }
 
@@ -203,22 +208,22 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
      *
      * @return paired list
      */
-    public List<ECRHubDevice> getPairedDeviceList() {
+    public List<EcrDevice> getPairedDeviceList() {
         String deviceList = SharePreferenceUtil.getString(Constants.ECR_HUB_PAIR_LIST_KEY, "");
-        List<ECRHubDevice> pairedDeviceList = new ArrayList<>();
+        List<EcrDevice> pairedDeviceList = new ArrayList<>();
         if (!deviceList.isEmpty()) {
             JSONArray array = JSON.parseArray(deviceList);
             for (int i = 0; i < array.size(); i++) {
-                ECRHubDevice data = JSON.parseObject(array.getJSONObject(i).toString(), ECRHubDevice.class);
+                EcrDevice data = JSON.parseObject(array.getJSONObject(i).toString(), EcrDevice.class);
                 pairedDeviceList.add(data);
             }
         }
         return pairedDeviceList;
     }
 
-    private void addPairedDevice(ECRHubMessageData data) {
+    private void addPairedDevice(EcrMessageData data) {
         JSONArray array = new JSONArray();
-        ECRHubDevice device = new ECRHubDevice();
+        EcrDevice device = new EcrDevice();
         device.setPort(data.getDevice_data().getPort());
         device.setIp_address(data.getDevice_data().getIp_address());
         if (null != data.getDevice_data().getAlias_name() && !"".equals(data.getDevice_data().getAlias_name())) {
@@ -236,7 +241,7 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
             array = JSON.parseArray(deviceList);
             boolean isHas = false;
             for (int i = 0; i < array.size(); i++) {
-                ECRHubDevice deviceData = JSON.parseObject(array.getJSONObject(i).toString(), ECRHubDevice.class);
+                EcrDevice deviceData = JSON.parseObject(array.getJSONObject(i).toString(), EcrDevice.class);
                 if (deviceData.getWs_address().equals(data.getDevice_data().getMac_address()) || deviceData.getIp_address().equals(data.getDevice_data().getIp_address()) || deviceData.getName().equals(data.getDevice_data().getDevice_name())) {
                     isHas = true;
                     break;
@@ -253,20 +258,20 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
         }
     }
 
-    public boolean confirmPair(ECRHubMessageData data) {
+    public boolean confirmPair(EcrMessageData data) {
         if (null != connection && connection.isOpen()) {
             if (data.getTopic().equals(Constants.ECR_HUB_TOPIC_PAIR)) {
                 data.setResponse_code("000");
                 connection.send(JSON.toJSON(data).toString());
                 addPairedDevice(data);
-                System.out.println("getPairedDeviceList: " + getPairedDeviceList());
+                Log.i(TAG, "getPairedDeviceList: " + getPairedDeviceList());
             }
             return true;
         }
         return false;
     }
 
-    public void cancelPair(ECRHubMessageData data) {
+    public void cancelPair(EcrMessageData data) {
         if (null != connection && connection.isOpen()) {
             if (data.getTopic().equals(Constants.ECR_HUB_TOPIC_PAIR)) {
                 data.setResponse_code("001");
@@ -277,8 +282,9 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
 
     @Override
     public void onMessageReceived(WebSocket connection, String message) {
+        Log.i(TAG, "Received message: " + message);
         this.connection = connection;
-        ECRHubMessageData data = JSON.parseObject(message, ECRHubMessageData.class);
+        EcrMessageData data = JSON.parseObject(message, EcrMessageData.class);
         if (data.getTopic().equals(Constants.ECR_HUB_TOPIC_UNPAIR)) {
             data.setResponse_code("000");
             connection.send(JSON.toJSON(data).toString());
@@ -291,28 +297,28 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
 
     @Override
     public void serviceAdded(ServiceEvent event) {
-        Log.e(TAG.toString(), "serviceAdded");
+        Log.i(TAG, "serviceAdded");
     }
 
     @Override
     public void serviceRemoved(ServiceEvent event) {
-        Log.e(TAG.toString(), "serviceRemoved");
+        Log.i(TAG, "serviceRemoved");
     }
 
     @Override
     public void serviceResolved(ServiceEvent event) {
-        Log.e(TAG.toString(), "serviceResolved");
+        Log.i(TAG, "serviceResolved");
         try {
             registerService();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         JSONObject info = toJsonObject(event.getInfo());
-        Log.e(TAG.toString(), "serviceResolved:" + info.toString());
-        List<ECRHubDevice> list = getPairedDeviceList();
+        Log.i(TAG, "serviceResolved:" + info.toString());
+        List<EcrDevice> list = getPairedDeviceList();
         JSONArray array = new JSONArray();
         for (int i = 0; i < list.size(); i++) {
-            ECRHubDevice device = list.get(i);
+            EcrDevice device = list.get(i);
             if (info.containsKey("name") && device.getWs_address().equals(info.getString("name"))) {
                 if (!info.getString("ip_address").equals(device.getIp_address()) || !info.getString("port").equals(device.getPort())) {
                     if (!"".equals(info.getString("port"))) {
@@ -351,21 +357,22 @@ public class ECRHubWebSocketDiscoveryService implements OnServerCallback, Servic
             }
             jsonObj.put("ip_address", ipv4);
             jsonObj.put("port", sInfo.getPort());
-            byte[] allInfo = sInfo.getTextBytes();
-            int allLen = allInfo.length;
-            byte fLen;
-            for (int index = 0; index < allLen; index += fLen) {
-                fLen = allInfo[index++];
-                byte[] fData = new byte[fLen];
-                System.arraycopy(allInfo, index, fData, 0, fLen);
-                String fInfo = new String(fData, StandardCharsets.UTF_8);
-                JSONObject jsonInfo = JSONObject.parseObject(fInfo);
-                if (!jsonInfo.isEmpty()) {
-                    for (String key : jsonInfo.keySet()) {
-                        jsonObj.put(key, jsonInfo.getString(key));
-                    }
-                }
-            }
+//            byte[] allInfo = sInfo.getTextBytes();
+//            int allLen = allInfo.length;
+//            byte fLen;
+//            for (int index = 0; index < allLen; index += fLen) {
+//                fLen = allInfo[index++];
+//                byte[] fData = new byte[fLen];
+//                System.arraycopy(allInfo, index, fData, 0, fLen);
+//                String fInfo = new String(fData, StandardCharsets.UTF_8);
+//                Log.i("test", fInfo);
+//                JSONObject jsonInfo = JSONObject.parseObject(fInfo);
+//                if (!jsonInfo.isEmpty()) {
+//                    for (String key : jsonInfo.keySet()) {
+//                        jsonObj.put(key, jsonInfo.getString(key));
+//                    }
+//                }
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }

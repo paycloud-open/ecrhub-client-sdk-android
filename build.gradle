@@ -31,7 +31,7 @@ allprojects {
             url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
         }
         flatDir {
-            dirs project(':wiseasy_ecr_sdk').file('libs')
+            dirs project(':ecr_sdk').file('libs')
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.wiseasy.ecr.sdk.device;
+package com.wiseasy.ecr.sdk.server;
 
 import org.java_websocket.WebSocket;
 

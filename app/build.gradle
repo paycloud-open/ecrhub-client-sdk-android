@@ -23,6 +23,6 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation project(path: ':wiseasy_ecr_sdk')
+    implementation project(path: ':ecr_sdk')
     //implementation 'com.github.paycloud-open:ecr-hub-client-sdk-android:1.0.2'
 }

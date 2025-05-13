@@ -24,5 +24,5 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation project(path: ':ecr_sdk')
-//    implementation 'com.github.paycloud-open:ecrhub-client-sdk-android:1.0.4'
+//    implementation 'com.github.paycloud-open:ecrhub-client-sdk-android:1.0.5'
 }

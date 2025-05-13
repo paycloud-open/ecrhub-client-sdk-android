@@ -14,11 +14,11 @@ import com.wiseasy.ecr.sdk.listener.EcrConnectListener;
 import com.wiseasy.ecr.sdk.listener.EcrResponseCallBack;
 import com.wiseasy.ecr.sdk.util.Constants;
 import com.wiseasy.ecr.sdk.util.NetUtils;
-import com.wiseecr.host.sdk.InitEcrHostSdkListener;
-import com.wiseecr.host.sdk.WiseEcrHostSdk;
-import com.wiseecr.host.sdk.cdc.EcrCdcHost;
-import com.wiseecr.host.sdk.cdc.EcrCdcListener;
-import com.wiseecr.host.sdk.common.ConnectionStatus;
+//import com.wiseecr.host.sdk.InitEcrHostSdkListener;
+//import com.wiseecr.host.sdk.WiseEcrHostSdk;
+//import com.wiseecr.host.sdk.cdc.EcrCdcHost;
+//import com.wiseecr.host.sdk.cdc.EcrCdcListener;
+//import com.wiseecr.host.sdk.common.ConnectionStatus;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.enums.ReadyState;
@@ -41,7 +41,7 @@ public class EcrClient {
     private String ipAddress;
 
     private WebSocketClient webSocketClient;
-    private EcrCdcHost ecrCdcHost;
+//    private EcrCdcHost ecrCdcHost;
 
     private Constants.ECRHubType type = Constants.ECRHubType.WLAN;
 
@@ -76,10 +76,10 @@ public class EcrClient {
         connectWlanServer();
     }
 
-    public void connectUsb() {
-        type = Constants.ECRHubType.USB;
-        openUsbServer();
-    }
+//    public void connectUsb() {
+//        type = Constants.ECRHubType.USB;
+//        openUsbServer();
+//    }
 
     public void disConnect() {
         if (type == Constants.ECRHubType.WLAN) {
@@ -89,10 +89,10 @@ public class EcrClient {
             webSocketClient.close();
             webSocketClient = null;
         } else {
-            ecrCdcHost.close();
-            if (null != connectListener) {
-                connectListener.onDisconnect();
-            }
+//            ecrCdcHost.close();
+//            if (null != connectListener) {
+//                connectListener.onDisconnect();
+//            }
         }
     }
 
@@ -100,12 +100,12 @@ public class EcrClient {
         if (type == Constants.ECRHubType.WLAN) {
             return null != webSocketClient && webSocketClient.isOpen();
         } else {
-            if (null == ecrCdcHost) {
+//            if (null == ecrCdcHost) {
                 return false;
-            } else {
-                int status = ecrCdcHost.getConnectionStatus();
-                return status == ConnectionStatus.STATUS_PORT_CONNECTED;
-            }
+//            } else {
+//                int status = ecrCdcHost.getConnectionStatus();
+//                return status == ConnectionStatus.STATUS_PORT_CONNECTED;
+//            }
         }
     }
 
@@ -164,67 +164,67 @@ public class EcrClient {
     }
 
     private void initUsbConnect() {
-        WiseEcrHostSdk.getInstance().initEcrHostSdk(context, new InitEcrHostSdkListener() {
-            @Override
-            public void onInitEcrHostSdkSuccess() {
-                ecrCdcHost = WiseEcrHostSdk.getInstance().getEcrCdcHost();
-                ecrCdcHost.initForRawData(new EcrCdcListener() {
-                    @Override
-                    public void onStatusChanged(int i) {
-                        if (i == ConnectionStatus.STATUS_CABLE_UNPLUGGED) {
-                            if (null != ecrCdcHost) {
-                                ecrCdcHost.close();
-                            }
-                        } else if (i == ConnectionStatus.STATUS_CABLE_PLUGGED) {
-                            if (null != ecrCdcHost) {
-                                ecrCdcHost.open();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onRawDataReceived(byte[] bytes) {
-                        String message = new String(bytes);
-                        Log.e(TAG, "收到消息" + message);
-                        JSONObject data = JSON.parseObject(message);
-                        String topic = data.getString("topic");
-
-                        EcrResponseCallBack callBack = callBackHashMap.get(topic);
-                        if (callBack != null) {
-                            callBack.onSuccess(message);
-                        }
-                    }
-
-                    @Override
-                    public void onPacketDataReceived(String s) {
-
-                    }
-
-                    @Override
-                    public void onError(int i) {
-
-                    }
-                });
-                int ret = ecrCdcHost.open();
-                if (ret == 0) {
-                    if (null != connectListener) {
-                        connectListener.onConnect();
-                    }
-                } else {
-                    if (null != connectListener) {
-                        Log.e(TAG, "返回错误码" + ret + "");
-                        connectListener.onError(ret + "", "");
-                    }
-                }
-            }
-
-            @Override
-            public void onInitEcrHostSdkFail(int errCode) {
-                if (null != connectListener) {
-                    connectListener.onError(errCode + "", "");
-                }
-            }
-        });
+//        WiseEcrHostSdk.getInstance().initEcrHostSdk(context, new InitEcrHostSdkListener() {
+//            @Override
+//            public void onInitEcrHostSdkSuccess() {
+//                ecrCdcHost = WiseEcrHostSdk.getInstance().getEcrCdcHost();
+//                ecrCdcHost.initForRawData(new EcrCdcListener() {
+//                    @Override
+//                    public void onStatusChanged(int i) {
+//                        if (i == ConnectionStatus.STATUS_CABLE_UNPLUGGED) {
+//                            if (null != ecrCdcHost) {
+//                                ecrCdcHost.close();
+//                            }
+//                        } else if (i == ConnectionStatus.STATUS_CABLE_PLUGGED) {
+//                            if (null != ecrCdcHost) {
+//                                ecrCdcHost.open();
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onRawDataReceived(byte[] bytes) {
+//                        String message = new String(bytes);
+//                        Log.e(TAG, "收到消息" + message);
+//                        JSONObject data = JSON.parseObject(message);
+//                        String topic = data.getString("topic");
+//
+//                        EcrResponseCallBack callBack = callBackHashMap.get(topic);
+//                        if (callBack != null) {
+//                            callBack.onSuccess(message);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onPacketDataReceived(String s) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(int i) {
+//
+//                    }
+//                });
+//                int ret = ecrCdcHost.open();
+//                if (ret == 0) {
+//                    if (null != connectListener) {
+//                        connectListener.onConnect();
+//                    }
+//                } else {
+//                    if (null != connectListener) {
+//                        Log.e(TAG, "返回错误码" + ret + "");
+//                        connectListener.onError(ret + "", "");
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onInitEcrHostSdkFail(int errCode) {
+//                if (null != connectListener) {
+//                    connectListener.onError(errCode + "", "");
+//                }
+//            }
+//        });
     }
 
     /**
@@ -248,31 +248,31 @@ public class EcrClient {
     }
 
     private void openUsbServer() {
-        if (null == ecrCdcHost) {
-            initUsbConnect();
-        } else {
-            int type = ecrCdcHost.getConnectionStatus();
-            if (type == ConnectionStatus.STATUS_PORT_CONNECTED) {
-                if (null != connectListener) {
-                    connectListener.onConnect();
-                }
-            } else if (type == ConnectionStatus.STATUS_PORT_DISCONNECTED || type == ConnectionStatus.STATUS_CABLE_PLUGGED) {
-                int ret = ecrCdcHost.open();
-                if (ret == 0) {
-                    if (null != connectListener) {
-                        connectListener.onConnect();
-                    }
-                } else {
-                    if (null != connectListener) {
-                        connectListener.onError(ret + "", "");
-                    }
-                }
-            } else {
-                if (null != connectListener) {
-                    connectListener.onError("-1", "");
-                }
-            }
-        }
+//        if (null == ecrCdcHost) {
+//            initUsbConnect();
+//        } else {
+//            int type = ecrCdcHost.getConnectionStatus();
+//            if (type == ConnectionStatus.STATUS_PORT_CONNECTED) {
+//                if (null != connectListener) {
+//                    connectListener.onConnect();
+//                }
+//            } else if (type == ConnectionStatus.STATUS_PORT_DISCONNECTED || type == ConnectionStatus.STATUS_CABLE_PLUGGED) {
+//                int ret = ecrCdcHost.open();
+//                if (ret == 0) {
+//                    if (null != connectListener) {
+//                        connectListener.onConnect();
+//                    }
+//                } else {
+//                    if (null != connectListener) {
+//                        connectListener.onError(ret + "", "");
+//                    }
+//                }
+//            } else {
+//                if (null != connectListener) {
+//                    connectListener.onError("-1", "");
+//                }
+//            }
+//        }
     }
 
     public void getTerminalInfo(EcrResponseCallBack callBack){
@@ -307,11 +307,11 @@ public class EcrClient {
                 webSocketClient.send(params);
             }
         } else {
-            if (null != ecrCdcHost && ecrCdcHost.getConnectionStatus() == ConnectionStatus.STATUS_PORT_CONNECTED) {
-                byte[] request = params.getBytes(StandardCharsets.UTF_8);
-                int ret = ecrCdcHost.sendRawData(request, request.length);
-                Log.i(TAG, "CDC send result: " + ret);
-            }
+//            if (null != ecrCdcHost && ecrCdcHost.getConnectionStatus() == ConnectionStatus.STATUS_PORT_CONNECTED) {
+//                byte[] request = params.getBytes(StandardCharsets.UTF_8);
+//                int ret = ecrCdcHost.sendRawData(request, request.length);
+//                Log.i(TAG, "CDC send result: " + ret);
+//            }
         }
     }
 
